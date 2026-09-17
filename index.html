@@ -83,6 +83,7 @@ button.orange{background:#f59e0b}
 .b-static{background:#fee2e2;color:#b91c1c}
 .b-dynamic{background:#dbeafe;color:#1d4ed8}
 
+/* Autocomplete */
 .autocomplete-wrap{position:relative}
 .autocomplete-list{display:none;position:absolute;top:100%;left:0;right:0;
   background:#fff;border:1px solid var(--border);border-radius:10px;
@@ -102,6 +103,14 @@ button.orange{background:#f59e0b}
 .autocomplete-item .full{color:var(--muted);font-size:11px;line-height:1.3}
 .autocomplete-empty{padding:16px;text-align:center;color:var(--muted);font-size:12.5px}
 
+/* Logo ngân hàng trong hint (dưới ô BIN) */
+.bank-hint-row{display:inline-flex;align-items:center;gap:8px;vertical-align:middle}
+.bank-logo-hint{width:24px;height:24px;object-fit:contain;flex:none;
+  border-radius:4px;background:#fff}
+.bank-logo-fallback{display:inline-flex;align-items:center;justify-content:center;
+  font-size:16px;background:transparent;width:24px;height:24px;flex:none}
+
+/* QR output */
 .qr-out{display:none;margin-top:14px;text-align:center}
 .qr-out.show{display:block}
 #qrCanvas{display:flex;justify-content:center;align-items:center;min-height:100px;
@@ -118,6 +127,7 @@ button.orange{background:#f59e0b}
   min-height:56px;background:#f8f9fb}
 .empty{text-align:center;padding:26px 12px;color:#9ca3af;font-size:13px;line-height:1.6}
 
+/* Camera overlay */
 #cam{display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column}
 #cam.show{display:flex}
 #reader{flex:1;overflow:hidden;background:#000;position:relative}
@@ -133,6 +143,7 @@ button.orange{background:#f59e0b}
   left:20px;right:20px;text-align:center;color:#fff;font-size:12px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);opacity:.85}
 
+/* Sticky button */
 .sticky{position:fixed;bottom:0;left:0;right:0;
   padding:12px 16px calc(12px + var(--safe-bottom));
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
@@ -140,6 +151,7 @@ button.orange{background:#f59e0b}
 .sticky button{width:100%;font-size:16px;padding:14px;
   box-shadow:0 4px 14px rgba(0,120,215,.35)}
 
+/* Toast */
 #toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;
   transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.9);
   color:#fff;padding:11px 20px;border-radius:24px;font-size:13.5px;
@@ -149,6 +161,7 @@ button.orange{background:#f59e0b}
   box-shadow:0 8px 24px rgba(0,0,0,.25)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* Bottom sheet */
 #sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;
   align-items:flex-end;justify-content:center}
 #sheet.show{display:flex;animation:fadeIn .2s ease}
@@ -356,7 +369,6 @@ function parseTLV(text){
   return r;
 }
 
-/* Build VietQR — tag 01 khác biệt duy nhất giữa tĩnh/động */
 function buildVietQR({bin, acc, holder = '', amount = '', content = '',
                       method = 'dynamic', includeHolder = false}){
   const isStatic = (method === 'static');
@@ -580,7 +592,7 @@ function refreshState(){
 FORM_IDS.forEach(id => $(id).addEventListener('input', refreshState));
 
 /* ===================================================================
-   PHẦN 6 — AUTOCOMPLETE NGÂN HÀNG
+   PHẦN 6 — AUTOCOMPLETE NGÂN HÀNG (có logo)
    =================================================================== */
 const bankSuggestEl = $('bankSuggest');
 const bankHintEl    = $('bankNameHint');
@@ -588,7 +600,7 @@ const bankHintEl    = $('bankNameHint');
 function updateBankHint(){
   if (!bankHintEl) return;
   const v = bankEl.value.trim();
-  if (!v){ bankHintEl.textContent = ''; return; }
+  if (!v){ bankHintEl.innerHTML = ''; return; }
 
   if (BANKS.length === 0){
     if (/^\d{6}$/.test(v)){
@@ -611,15 +623,27 @@ function updateBankHint(){
   );
 
   if (found){
-    bankHintEl.innerHTML = `🏦 <b>${found.bin}</b> · ${found.shortName} (${found.code})` +
-      (found.swiftCode ? ` · SWIFT: <code>${found.swiftCode}</code>` : '') +
-      `<br><span style="color:var(--muted);font-size:10.5px">${found.fullName}</span>`;
+    // ✅ Logo động + thông tin ngân hàng
+    const logoHtml = found.logo
+      ? `<img src="${found.logo}" alt="" class="bank-logo-hint"
+              onerror="this.style.display='none'">`
+      : `<span class="bank-logo-hint bank-logo-fallback">🏦</span>`;
+
+    bankHintEl.innerHTML =
+      `<span class="bank-hint-row">
+         ${logoHtml}
+         <span>
+           <b>${found.bin}</b> · ${found.shortName} (${found.code})` +
+           (found.swiftCode ? ` · SWIFT: <code>${found.swiftCode}</code>` : '') +
+         `</span>
+       </span>
+       <br><span style="color:var(--muted);font-size:10.5px">${found.fullName}</span>`;
     bankHintEl.style.color = 'var(--success)';
   } else if (/^\d{6}$/.test(v)){
     bankHintEl.textContent = '⚠️ BIN không có trong danh sách';
     bankHintEl.style.color = 'var(--warning)';
   } else {
-    bankHintEl.textContent = '';
+    bankHintEl.innerHTML = '';
   }
 }
 
@@ -651,16 +675,26 @@ function renderBankSuggest(query){
     return;
   }
 
-  bankSuggestEl.innerHTML = matches.map(b => `
+  bankSuggestEl.innerHTML = matches.map(b => {
+    const logoHtml = b.logo
+      ? `<img src="${b.logo}" alt="" class="bank-logo-hint"
+              onerror="this.style.display='none'">`
+      : `<span class="bank-logo-hint bank-logo-fallback">🏦</span>`;
+
+    return `
     <div class="autocomplete-item" data-bin="${b.bin}">
       <div class="l1">
-        <span class="bin">${b.bin}</span>
+        <span style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+          ${logoHtml}
+          <span class="bin">${b.bin}</span>
+        </span>
         <span class="code">${b.code || ''}</span>
       </div>
       <div class="name">${b.shortName || ''}${b.swiftCode ? ` <span style="color:#888;font-weight:400;font-size:11px">· ${b.swiftCode}</span>` : ''}</div>
       <div class="full">${b.fullName || ''}</div>
     </div>
-  `).join('');
+    `;
+  }).join('');
 
   bankSuggestEl.classList.add('show');
 
@@ -710,8 +744,6 @@ bankEl.addEventListener('blur', () => {
 /* ===================================================================
    PHẦN 7 — CHECKBOX TĨNH/ĐỘNG + ĐẾM KÝ TỰ + FORMAT TIỀN
    =================================================================== */
-
-/* ✅ Đã sửa nhãn hint tĩnh/động */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
   if (chkStaticEl.checked){

@@ -1,0 +1,26 @@
+{
+  "name": "QRoX Mobile",
+  "short_name": "QRoX",
+  "description": "QR / Barcode Reader + VietQR Generator",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f7",
+  "theme_color": "#0078d7",
+  "lang": "vi",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/0078d7/ffffff?text=QRoX",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://via.placeholder.com/512/0078d7/ffffff?text=QRoX",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

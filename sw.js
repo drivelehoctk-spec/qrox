@@ -1,20 +1,19 @@
-/* Service Worker — QRoX Mobile
-   ⚠️ CACHE version đổi thành v3 để force clear cache cũ */
+/* Service Worker — QRoX Mobile */
 
-/* const CACHE = 'qrox-v3'; */
-const CACHE = 'qrox-v4';
+const CACHE = 'qrox-v10';
 const CORE = [
   './',
   './index.html',
   './manifest.json',
   './qrcode.min.js',
-  './html5-qrcode.min.js'
+  './html5-qrcode.min.js',
+  './banks.json'
 ];
 
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(CORE).catch(err => console.warn('Cache some files failed:', err)))
+      .then(c => c.addAll(CORE).catch(err => console.warn('Cache một số file lỗi:', err)))
       .then(() => self.skipWaiting())
   );
 });
@@ -31,11 +30,16 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+
+  // API VietQR: ưu tiên network, không cache
+  if (e.request.url.includes('api.vietqr.io')){
+    return;   // Để browser tự fetch
+  }
+
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
       return fetch(e.request).then(res => {
-        // Chỉ cache response OK cùng origin
         if (res.ok && e.request.url.startsWith(self.location.origin)){
           const clone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, clone));

@@ -10,7 +10,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMDA3OGQ3Ii8+PHRleHQgeD0iOTYiIHk9IjEyNCIgZm9udC1zaXplPSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSJib2xkIj5RUjwvdGV4dD48L3N2Zz4=">
 
-<!-- Nhúng local — không dùng CDN để tránh lỗi MIME -->
 <script src="qrcode.min.js"></script>
 <script src="html5-qrcode.min.js"></script>
 
@@ -268,11 +267,11 @@ button.orange{background:#f59e0b}
 
   <label class="chk-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
     <input type="checkbox" id="chkStatic">
-    <span>Tạo <b>QR tĩnh</b> — khách <u>không sửa được</u> khi quét</span>
+    <span><b>QR tĩnh</b> — khách không sửa được khi quét</span>
   </label>
   <div class="hint" id="modeHint"
        style="color:var(--success);margin-top:-2px;margin-bottom:4px">
-    Mã động — khách có thể sửa số tiền &amp; nội dung khi quét
+    Đang tạo QR động — khách có thể sửa số tiền &amp; nội dung khi quét.
   </div>
 
   <label class="chk-row">
@@ -556,7 +555,7 @@ function toast(msg, duration = 2200){
 }
 
 /* ===================================================================
-   PHẦN 5 — STATE MACHINE (đã sửa: bỏ "giữ nguyên")
+   PHẦN 5 — STATE MACHINE
    =================================================================== */
 function refreshState(){
   const bank  = bankEl.value.trim();
@@ -711,13 +710,15 @@ bankEl.addEventListener('blur', () => {
 /* ===================================================================
    PHẦN 7 — CHECKBOX TĨNH/ĐỘNG + ĐẾM KÝ TỰ + FORMAT TIỀN
    =================================================================== */
+
+/* ✅ Đã sửa nhãn hint tĩnh/động */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
   if (chkStaticEl.checked){
-    hint.textContent = 'Mã tĩnh — khách không sửa được, chỉ xác nhận thanh toán';
+    hint.textContent = 'Đang tạo QR tĩnh - khách không sửa được, chỉ xác nhận thanh toán.';
     hint.style.color = 'var(--warning)';
   } else {
-    hint.textContent = 'Mã động — khách có thể sửa số tiền & nội dung khi quét';
+    hint.textContent = 'Đang tạo QR động — khách có thể sửa số tiền & nội dung khi quét.';
     hint.style.color = 'var(--success)';
   }
 });
@@ -879,7 +880,7 @@ async function decodeImage(img){
 }
 
 /* ===================================================================
-   PHẦN 11 — XỬ LÝ SAU KHI DECODE (đã sửa: gộp shortName vào Số TK)
+   PHẦN 11 — XỬ LÝ SAU KHI DECODE
    =================================================================== */
 function handleDecoded(text){
   if (!text) return;

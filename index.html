@@ -7,17 +7,15 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>QRoX Mobile</title>
+<link rel="manifest" href="manifest.json">
 
-<!-- ============================================================
-     CDN: dùng unpkg thay jsdelivr (jsdelivr trả MIME text/plain
-     → trình duyệt chặn do X-Content-Type-Options: nosniff)
-     ============================================================ -->
-<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<!-- ⚠️ Nhúng local — KHÔNG dùng CDN để tránh lỗi MIME / corrupted content -->
+<script src="qrcode.min.js"></script>
+<script src="html5-qrcode.min.js"></script>
 
 <style>
 :root{
-  --bg:#f5f5f7; --card:#fff; --primary:#0078d7; --primary-dark:#0066b8;
+  --bg:#f5f5f7; --card:#fff; --primary:#0078d7;
   --success:#16a34a; --danger:#dc2626; --warning:#f59e0b;
   --text:#1a1a1a; --muted:#666; --border:#e2e5ea; --radius:14px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -27,19 +25,16 @@ html,body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe
   font-size:15px;color:var(--text);background:var(--bg);-webkit-text-size-adjust:100%;
   overscroll-behavior-y:contain}
 body{padding:12px 12px calc(90px + var(--safe-bottom));min-height:100vh}
-
 @media (min-width:520px){
   body{max-width:500px;margin:0 auto;padding:16px 16px calc(100px + var(--safe-bottom))}
 }
 
-/* ==== Card ==== */
 .card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;
   box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}
 .card h2{margin:0 0 12px;font-size:15px;font-weight:600;color:var(--primary);
   display:flex;align-items:center;gap:6px}
 .card .sub{margin:-6px 0 10px;font-size:12px;color:var(--muted)}
 
-/* ==== Form ==== */
 label.f{display:block;font-size:12.5px;color:var(--muted);margin:0 0 4px;font-weight:500}
 input[type=text],input[type=tel],input[type=number],textarea{
   width:100%;padding:12px 14px;font-size:16px;border:1px solid var(--border);
@@ -53,7 +48,6 @@ textarea{min-height:56px;resize:vertical;font-family:inherit}
 .counter.warn{color:var(--warning);font-weight:600}
 .counter.danger{color:var(--danger);font-weight:600}
 
-/* ==== Buttons ==== */
 button{font-family:inherit;font-size:15px;font-weight:600;padding:12px 16px;border:none;
   border-radius:10px;background:var(--primary);color:#fff;cursor:pointer;min-height:44px;
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
@@ -62,22 +56,17 @@ button:active:not(:disabled){transform:scale(.97);opacity:.85}
 button:disabled{background:#cbd0d6;cursor:not-allowed;box-shadow:none}
 button.sec{background:#f1f3f5;color:#222;border:1px solid var(--border)}
 button.green{background:var(--success)}
-button.orange{background:var(--warning)}
-button.red{background:var(--danger)}
 
-/* ==== Source buttons (3 ô) ==== */
 .src-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
 .src-btn{flex-direction:column;padding:14px 6px;font-size:12px;line-height:1.4;
   background:#f8f9fb;color:#222;border:1px solid var(--border);font-weight:500}
 .src-btn .ic{font-size:24px;margin-bottom:4px}
 
-/* ==== Checkbox ==== */
 .chk-row{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer;
   user-select:none;-webkit-user-select:none}
 .chk-row input[type=checkbox]{width:20px;height:20px;margin:0;flex:none;accent-color:var(--primary)}
 .chk-row span{font-size:14px;color:#222;line-height:1.4}
 
-/* ==== Info panel ==== */
 .info{display:none;margin-top:10px;padding:12px 14px;
   background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);
   border-radius:12px;border-left:4px solid var(--success)}
@@ -93,7 +82,6 @@ button.red{background:var(--danger)}
 .b-static{background:#fee2e2;color:#b91c1c}
 .b-dynamic{background:#dbeafe;color:#1d4ed8}
 
-/* ==== QR output ==== */
 .qr-out{display:none;margin-top:14px;text-align:center}
 .qr-out.show{display:block}
 #qrCanvas{max-width:100%;height:auto;border-radius:12px;border:1px solid var(--border);
@@ -104,7 +92,6 @@ button.red{background:var(--danger)}
   min-height:56px;background:#f8f9fb}
 .empty{text-align:center;padding:26px 12px;color:#9ca3af;font-size:13px;line-height:1.6}
 
-/* ==== Camera overlay ==== */
 #cam{display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column}
 #cam.show{display:flex}
 #reader{flex:1;overflow:hidden;background:#000;position:relative}
@@ -120,7 +107,6 @@ button.red{background:var(--danger)}
   left:20px;right:20px;text-align:center;color:#fff;font-size:12px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);opacity:.85}
 
-/* ==== Sticky action ==== */
 .sticky{position:fixed;bottom:0;left:0;right:0;
   padding:12px 16px calc(12px + var(--safe-bottom));
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
@@ -128,7 +114,6 @@ button.red{background:var(--danger)}
 .sticky button{width:100%;font-size:16px;padding:14px;
   box-shadow:0 4px 14px rgba(0,120,215,.35)}
 
-/* ==== Toast ==== */
 #toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;
   transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.9);
   color:#fff;padding:11px 20px;border-radius:24px;font-size:13.5px;
@@ -138,7 +123,6 @@ button.red{background:var(--danger)}
   box-shadow:0 8px 24px rgba(0,0,0,.25)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ==== Action sheet ==== */
 #sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;
   align-items:flex-end;justify-content:center}
 #sheet.show{display:flex;animation:fadeIn .2s ease}
@@ -158,10 +142,8 @@ button.red{background:var(--danger)}
 </head>
 <body>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- Camera overlay -->
 <div id="cam">
   <div class="cam-top">
     <span class="ttl">📷 Quét QR</span>
@@ -171,7 +153,6 @@ button.red{background:var(--danger)}
   <div class="cam-tip">Căn QR vào giữa khung, giữ khoảng 15–20 cm</div>
 </div>
 
-<!-- Bottom sheet cho menu ảnh QR -->
 <div id="sheet" onclick="if(event.target===this)closeSheet()">
   <div class="sheet-body">
     <div class="grab"></div>
@@ -185,9 +166,7 @@ button.red{background:var(--danger)}
   </div>
 </div>
 
-<!-- ============================================================
-     CARD 1 — NGUỒN ẢNH QR
-     ============================================================ -->
+<!-- CARD 1 — NGUỒN ẢNH -->
 <div class="card">
   <h2>📥 Nạp ảnh QR</h2>
   <p class="sub">Chọn 1 trong 3 cách để đọc mã QR</p>
@@ -205,9 +184,7 @@ button.red{background:var(--danger)}
   <input id="filePick" type="file" accept="image/*" style="display:none">
 </div>
 
-<!-- ============================================================
-     CARD 2 — FORM
-     ============================================================ -->
+<!-- CARD 2 — FORM -->
 <div class="card">
   <h2>💳 Thông tin thanh toán</h2>
 
@@ -230,7 +207,7 @@ button.red{background:var(--danger)}
   <div class="fg">
     <label class="f">Số tiền (VND) <span style="font-weight:400">(tuỳ chọn)</span></label>
     <input id="amt" type="tel" inputmode="numeric" placeholder="Để trống = khách tự nhập" autocomplete="off">
-    <div class="hint">Để trống nếu muốn người nhận tự nhập số tiền</div>
+    <div class="hint">Nếu để trống, khách phải tự nhập số tiền khi quét</div>
   </div>
 
   <div class="fg">
@@ -239,7 +216,6 @@ button.red{background:var(--danger)}
     <div class="counter" id="charCount">0 / 99</div>
   </div>
 
-  <!-- Panel thông tin QR đã đọc -->
   <div class="info" id="infoPanel">
     <div class="t">✅ QR đã đọc thành công</div>
     <div class="row"><div class="lbl">Ngân hàng:</div><div class="val" id="iBank">—</div></div>
@@ -250,12 +226,13 @@ button.red{background:var(--danger)}
     <div class="row"><div class="lbl">Chế độ:</div><div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div></div>
   </div>
 
+  <!-- ⚠️ NHÃN ĐÃ SỬA: tĩnh = khách không sửa được (không phải "không có số tiền") -->
   <label class="chk-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
     <input type="checkbox" id="chkStatic">
-    <span>Tạo mã QR <b>tĩnh</b> — không nhúng số tiền</span>
+    <span>Tạo <b>QR tĩnh</b> — khách <u>không sửa được</u> khi quét</span>
   </label>
   <div class="hint" id="modeHint" style="color:var(--success);margin-top:-2px;margin-bottom:4px">
-    Mã động — người quét có thể sửa số tiền / nội dung
+    Mã động — khách có thể sửa số tiền &amp; nội dung khi quét
   </div>
 
   <label class="chk-row">
@@ -264,9 +241,7 @@ button.red{background:var(--danger)}
   </label>
 </div>
 
-<!-- ============================================================
-     CARD 3 — KẾT QUẢ
-     ============================================================ -->
+<!-- CARD 3 — KẾT QUẢ -->
 <div class="card">
   <h2>🎯 Mã QR kết quả</h2>
 
@@ -288,19 +263,16 @@ button.red{background:var(--danger)}
   </div>
 </div>
 
-<!-- ============================================================
-     STICKY ACTION
-     ============================================================ -->
 <div class="sticky">
   <button id="btnGen" onclick="genQR()" disabled>Tạo mã QR</button>
 </div>
 
 <script>
 /* ===================================================================
-   PHẦN 1 — VIETQR CORE (chuyển từ PowerShell sang JS)
+   VIETQR CORE
    =================================================================== */
 
-/* CRC16-CCITT — chuẩn EMVCo/VietQR */
+/* CRC16-CCITT — chuẩn EMVCo */
 function crc16(s){
   let crc = 0xFFFF, poly = 0x1021;
   for (const ch of s){
@@ -341,9 +313,13 @@ function parseTLV(text){
   return r;
 }
 
-/* Build chuỗi VietQR — chuẩn EMVCo
-   - QR tĩnh: tag 01 = 12, KHÔNG có tag 54 (số tiền)
-   - QR động: tag 01 = 11, có thể có tag 54 */
+/* ===================================================================
+   BUILD VIETQR — ✅ ĐÃ SỬA
+   Khác biệt duy nhất giữa tĩnh/động là TAG 01:
+     - 'dynamic' → tag 01 = '11'  (khách sửa được)
+     - 'static'  → tag 01 = '12'  (khách KHÔNG sửa được)
+   Tag 54 (số tiền) LUÔN có nếu user nhập — không phân biệt tĩnh/động
+   =================================================================== */
 function buildVietQR({bin, acc, holder = '', amount = '', content = '',
                       method = 'dynamic', includeHolder = false}){
   const isStatic = (method === 'static');
@@ -353,17 +329,16 @@ function buildVietQR({bin, acc, holder = '', amount = '', content = '',
     tlv('00', 'A000000727') + tlv('01', inner) + tlv('02', 'QRIBFTTA')
   );
 
-  // QR tĩnh → luôn bỏ tag 54 dù user có nhập số tiền
-  const amtTLV = (!isStatic && amount && +amount > 0)
-    ? tlv('54', String(+amount))
-    : '';
+  // ✅ SỬA: tag 54 LUÔN có nếu nhập tiền — KHÔNG phụ thuộc tĩnh/động
+  const amtTLV = (amount && +amount > 0) ? tlv('54', String(+amount)) : '';
 
+  // ✅ Tag 62 cũng luôn có nếu nhập nội dung
   const add = content ? tlv('08', strip(content)) : '';
   const addTLV = add ? tlv('62', add) : '6200';
 
-  // Chỉ thêm tag 59 (tên chủ TK) nếu được yêu cầu
   const mName = (includeHolder && holder) ? tlv('59', strip(holder)) : '';
 
+  // ⚠️ ĐIỂM KHÁC DUY NHẤT: tag 01
   const init = isStatic ? tlv('01', '12') : tlv('01', '11');
 
   const payload = tlv('00', '01') + init + merchant + tlv('53', '704')
@@ -372,7 +347,10 @@ function buildVietQR({bin, acc, holder = '', amount = '', content = '',
   return withCrc + crc16(withCrc);
 }
 
-/* Parse chuỗi VietQR → object thông tin */
+/* ===================================================================
+   PARSE VIETQR — ✅ ĐÃ SỬA
+   Tag 01 = '12' → tĩnh; '11' hoặc thiếu → động
+   =================================================================== */
 function parseVietQR(text){
   if (!text || !text.startsWith('000201') || !text.includes('A000000727')) return null;
   const root = parseTLV(text);
@@ -381,7 +359,6 @@ function parseVietQR(text){
     amount: '', content: '', isStatic: false
   };
 
-  // Field 38 hoặc 26 chứa merchant info
   const maRaw = root['38'] || root['26'];
   if (maRaw){
     const ma = parseTLV(maRaw);
@@ -397,29 +374,25 @@ function parseVietQR(text){
     const s = parseTLV(root['62']);
     out.content = s['08'] || s['01'] || '';
   }
-  // Tag 01: '11' = động, '12' = tĩnh, thiếu tag = mặc định tĩnh
+
+  // ✅ SỬA: tag 01='12' → tĩnh, ngược lại → động
   if (root['01']) out.isStatic = (root['01'] === '12');
-  else            out.isStatic = true;
+  else            out.isStatic = false;
 
   return out;
 }
 
 /* ===================================================================
-   PHẦN 2 — STATE
+   STATE
    =================================================================== */
-
-let lastScannedText = null;   // chuỗi QR gốc vừa decode
-let lastScannedInfo = null;   // object info parse từ QR gốc
-let currentQRBlob   = null;   // Blob PNG của QR mới nhất
-let scanner         = null;   // Html5Qrcode instance cho camera
+let lastScannedText = null;
+let lastScannedInfo = null;
+let currentQRBlob   = null;
+let scanner         = null;
 
 const FORM_IDS = ['bank', 'acc', 'holder', 'amt', 'msg'];
-
-/* ===================================================================
-   PHẦN 3 — SHORTCUTS & DOM
-   =================================================================== */
-
 const $ = id => document.getElementById(id);
+
 const bankEl      = $('bank');
 const accEl       = $('acc');
 const holderEl    = $('holder');
@@ -434,9 +407,8 @@ const noQREl      = $('noQR');
 const qrStrEl     = $('qrString');
 
 /* ===================================================================
-   PHẦN 4 — TOAST
+   TOAST
    =================================================================== */
-
 let toastTimer;
 function toast(msg, duration = 2200){
   const el = $('toast');
@@ -447,10 +419,8 @@ function toast(msg, duration = 2200){
 }
 
 /* ===================================================================
-   PHẦN 5 — STATE MANAGEMENT
+   STATE MACHINE — cập nhật nhãn nút Tạo QR
    =================================================================== */
-
-/* Cập nhật trạng thái nút Tạo QR mỗi khi form đổi */
 function refreshState(){
   const bank  = bankEl.value.trim();
   const acc   = accEl.value.trim();
@@ -473,19 +443,19 @@ function refreshState(){
 
 FORM_IDS.forEach(id => $(id).addEventListener('input', refreshState));
 
-/* Checkbox tĩnh/động — đổi label gợi ý */
+/* Checkbox tĩnh/động — nhãn đã sửa cho đúng ý nghĩa */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
   if (chkStaticEl.checked){
-    hint.textContent = 'Mã tĩnh — người quét phải tự nhập số tiền';
-    hint.style.color = 'var(--danger)';
+    hint.textContent = 'Mã tĩnh — khách không sửa được, chỉ xác nhận thanh toán';
+    hint.style.color = 'var(--warning)';
   } else {
-    hint.textContent = 'Mã động — người quét có thể sửa số tiền / nội dung';
+    hint.textContent = 'Mã động — khách có thể sửa số tiền & nội dung khi quét';
     hint.style.color = 'var(--success)';
   }
 });
 
-/* Đếm ký tự nội dung CK */
+/* Đếm ký tự */
 msgEl.addEventListener('input', () => {
   const len = msgEl.value.length;
   const el = $('charCount');
@@ -495,7 +465,7 @@ msgEl.addEventListener('input', () => {
   else if (len > 60) el.classList.add('warn');
 });
 
-/* Format số tiền có dấu chấm phân cách */
+/* Format số tiền có dấu chấm */
 let formattingAmt = false;
 amtEl.addEventListener('input', () => {
   if (formattingAmt) return;
@@ -516,25 +486,22 @@ amtEl.addEventListener('input', () => {
 });
 
 /* ===================================================================
-   PHẦN 6 — CAMERA
+   CAMERA
    =================================================================== */
-
 function openCamera(){
   const view = $('cam');
   view.classList.add('show');
 
   if (scanner){ scanner = null; }
-
   scanner = new Html5Qrcode('reader');
   scanner.start(
     { facingMode: 'environment' },
     { fps: 10, qrbox: { width: 260, height: 260 } },
     text => {
       closeCamera();
-      // Delay nhỏ để camera đóng hẳn rồi mới xử lý
       setTimeout(() => handleDecoded(text), 150);
     },
-    () => {}   // bỏ qua lỗi frame không có QR
+    () => {}
   ).catch(err => {
     closeCamera();
     toast('Không mở được camera: ' + err);
@@ -542,8 +509,7 @@ function openCamera(){
 }
 
 function closeCamera(){
-  const view = $('cam');
-  view.classList.remove('show');
+  $('cam').classList.remove('show');
   if (scanner){
     const s = scanner;
     scanner = null;
@@ -552,9 +518,8 @@ function closeCamera(){
 }
 
 /* ===================================================================
-   PHẦN 7 — CHỌN ẢNH TỪ THƯ VIỆN
+   CHỌN ẢNH TỪ THƯ VIỆN
    =================================================================== */
-
 function pickImage(){ $('filePick').click(); }
 
 $('filePick').addEventListener('change', function(){
@@ -564,21 +529,14 @@ $('filePick').addEventListener('change', function(){
 
   const url = URL.createObjectURL(file);
   const img = new Image();
-  img.onload = () => {
-    decodeImage(img);
-    URL.revokeObjectURL(url);
-  };
-  img.onerror = () => {
-    toast('Không đọc được ảnh');
-    URL.revokeObjectURL(url);
-  };
+  img.onload = () => { decodeImage(img); URL.revokeObjectURL(url); };
+  img.onerror = () => { toast('Không đọc được ảnh'); URL.revokeObjectURL(url); };
   img.src = url;
 });
 
 /* ===================================================================
-   PHẦN 8 — PASTE ẢNH TỪ CLIPBOARD
+   PASTE ẢNH TỪ CLIPBOARD
    =================================================================== */
-
 async function pasteImage(){
   try {
     if (!navigator.clipboard || !navigator.clipboard.read){
@@ -590,14 +548,10 @@ async function pasteImage(){
     for (const it of items){
       const imgType = it.types.find(t => t.startsWith('image/'));
       if (!imgType) continue;
-
       const blob = await it.getType(imgType);
       const url = URL.createObjectURL(blob);
       const img = new Image();
-      img.onload = () => {
-        decodeImage(img);
-        URL.revokeObjectURL(url);
-      };
+      img.onload = () => { decodeImage(img); URL.revokeObjectURL(url); };
       img.src = url;
       found = true;
       break;
@@ -609,11 +563,9 @@ async function pasteImage(){
 }
 
 /* ===================================================================
-   PHẦN 9 — DECODE ẢNH TĨNH
+   DECODE ẢNH TĨNH
    =================================================================== */
-
 function decodeImage(img){
-  // Dùng element ẩn riêng cho việc decode file, tránh xung đột camera
   let hidden = $('fileScanner');
   if (!hidden){
     hidden = document.createElement('div');
@@ -621,7 +573,6 @@ function decodeImage(img){
     hidden.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px';
     document.body.appendChild(hidden);
   }
-
   const tmp = new Html5Qrcode('fileScanner');
   tmp.scanFile(img, false)
     .then(text => handleDecoded(text))
@@ -630,9 +581,8 @@ function decodeImage(img){
 }
 
 /* ===================================================================
-   PHẦN 10 — XỬ LÝ SAU KHI DECODE
+   SAU KHI DECODE
    =================================================================== */
-
 function handleDecoded(text){
   if (!text) return;
   text = text.trim().replace(/[\r\n]+/g, '').replace(/\u200B/g, '');
@@ -641,14 +591,13 @@ function handleDecoded(text){
   const info = parseVietQR(text);
 
   if (info && info.bankCode && info.account){
-    /* === QR là VietQR hợp lệ → fill form === */
     bankEl.value   = info.bankCode;
     accEl.value    = info.account;
     holderEl.value = info.accHolder || '';
     amtEl.value    = info.amount ? Number(info.amount).toLocaleString('vi-VN') : '';
     msgEl.value    = info.content || '';
 
-    // Đồng bộ checkbox tĩnh/động theo QR gốc
+    // ✅ Sync checkbox tĩnh/động theo tag 01 của QR gốc
     chkStaticEl.checked = info.isStatic;
     chkStaticEl.dispatchEvent(new Event('change'));
 
@@ -660,7 +609,6 @@ function handleDecoded(text){
       content:   info.content || ''
     };
 
-    // Điền panel thông tin
     $('iBank').textContent    = info.bankCode;
     $('iAcc').textContent     = info.account;
     $('iHolder').textContent  = info.accHolder || '(không có)';
@@ -674,14 +622,11 @@ function handleDecoded(text){
     badge.className = info.isStatic ? 'badge b-static' : 'badge b-dynamic';
 
     $('infoPanel').classList.add('show');
-
-    // Update counter ký tự
     msgEl.dispatchEvent(new Event('input'));
 
-    toast('✅ Đã đọc QR — bạn có thể sửa nội dung rồi tạo mới');
+    toast('✅ Đã đọc QR — bạn có thể sửa rồi tạo mới');
 
   } else {
-    /* === QR không phải VietQR (URL, wifi, text...) === */
     lastScannedInfo = null;
     $('infoPanel').classList.remove('show');
     qrStrEl.value = text;
@@ -690,7 +635,6 @@ function handleDecoded(text){
 
   refreshState();
 
-  // Scroll đến form cho user thấy đã fill
   if (info){
     setTimeout(() => {
       document.querySelector('.card:nth-child(2)')?.scrollIntoView({
@@ -701,9 +645,8 @@ function handleDecoded(text){
 }
 
 /* ===================================================================
-   PHẦN 11 — TẠO QR
+   TẠO QR
    =================================================================== */
-
 async function genQR(){
   try {
     const amountRaw = amtEl.value.replace(/\D/g, '');
@@ -722,16 +665,14 @@ async function genQR(){
       return;
     }
 
-    // Kiểm tra thư viện đã load chưa
     if (typeof QRCode === 'undefined'){
-      toast('Thư viện QR chưa tải xong. Vui lòng thử lại sau vài giây.');
+      toast('Thư viện QR chưa tải. Vui lòng tải lại trang.');
       return;
     }
 
     const qr = buildVietQR(payload);
     qrStrEl.value = qr;
 
-    // Vẽ QR lên canvas — dùng kích thước lớn để ảnh nét
     await QRCode.toCanvas(qrCanvasEl, qr, {
       width: 640,
       margin: 2,
@@ -739,17 +680,13 @@ async function genQR(){
       color: { dark: '#000000', light: '#ffffff' }
     });
 
-    // Hiện output
     noQREl.style.display = 'none';
     qrOutEl.classList.add('show');
 
-    // Sinh blob PNG để copy/tải
     qrCanvasEl.toBlob(b => { currentQRBlob = b; }, 'image/png');
 
-    // Tự động copy vào clipboard (đợi blob xong)
     setTimeout(() => autoCopyQR(), 120);
 
-    // Scroll xuống xem QR
     setTimeout(() => {
       qrOutEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 200);
@@ -760,13 +697,12 @@ async function genQR(){
 }
 
 /* ===================================================================
-   PHẦN 12 — COPY QR VÀO CLIPBOARD
+   AUTO-COPY SAU KHI TẠO
    =================================================================== */
-
 async function autoCopyQR(){
   try {
     if (!navigator.clipboard){
-      toast('Đã tạo QR (không sao chép được — thiếu quyền)');
+      toast('Đã tạo QR (không sao chép được)');
       return;
     }
     if (currentQRBlob && window.ClipboardItem){
@@ -777,8 +713,7 @@ async function autoCopyQR(){
       await navigator.clipboard.writeText(qrStrEl.value);
       toast('✅ Đã tạo QR & sao chép chuỗi');
     }
-  } catch (e){
-    // Fallback: copy text
+  } catch {
     try {
       await navigator.clipboard.writeText(qrStrEl.value);
       toast('Đã tạo QR (đã copy chuỗi)');
@@ -788,11 +723,11 @@ async function autoCopyQR(){
   }
 }
 
+/* ===================================================================
+   COPY / TẢI QR
+   =================================================================== */
 async function copyQR(){
-  if (!currentQRBlob){
-    toast('Chưa có QR để sao chép');
-    return;
-  }
+  if (!currentQRBlob){ toast('Chưa có QR để sao chép'); return; }
   try {
     if (!navigator.clipboard || !window.ClipboardItem){
       await navigator.clipboard.writeText(qrStrEl.value);
@@ -807,15 +742,8 @@ async function copyQR(){
   }
 }
 
-/* ===================================================================
-   PHẦN 13 — TẢI QR VỀ MÁY
-   =================================================================== */
-
 function downloadQR(){
-  if (!currentQRBlob){
-    toast('Chưa có QR để tải');
-    return;
-  }
+  if (!currentQRBlob){ toast('Chưa có QR để tải'); return; }
   const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(currentQRBlob);
@@ -828,13 +756,11 @@ function downloadQR(){
 }
 
 /* ===================================================================
-   PHẦN 14 — NHẤN GIỮ ẢNH QR → MENU
+   NHẤN GIỮ ẢNH QR → MENU
    =================================================================== */
-
 function openSheet(){ $('sheet').classList.add('show'); }
 function closeSheet(){ $('sheet').classList.remove('show'); }
 
-/* Long-press cho mobile */
 let longPressTimer;
 qrCanvasEl.addEventListener('touchstart', () => {
   longPressTimer = setTimeout(() => {
@@ -845,17 +771,12 @@ qrCanvasEl.addEventListener('touchstart', () => {
 qrCanvasEl.addEventListener('touchend',    () => clearTimeout(longPressTimer));
 qrCanvasEl.addEventListener('touchmove',   () => clearTimeout(longPressTimer));
 qrCanvasEl.addEventListener('touchcancel', () => clearTimeout(longPressTimer));
-
-/* Chuột phải trên desktop */
 qrCanvasEl.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   openSheet();
 });
 
-/* ===================================================================
-   PHẦN 15 — PHÍM ENTER TRONG INPUT → TẠO QR
-   =================================================================== */
-
+/* Enter → Tạo QR */
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && e.target.tagName === 'INPUT'){
     e.preventDefault();
@@ -863,29 +784,22 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* ===================================================================
-   PHẦN 16 — SERVICE WORKER
-   =================================================================== */
-
+/* Service Worker */
 if ('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-/* ===================================================================
-   PHẦN 17 — KHỞI TẠO
-   =================================================================== */
-
+/* Khởi tạo */
 refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
 
-/* Kiểm tra thư viện CDN đã load chưa — nếu chưa, cảnh báo sau 3s */
+/* Cảnh báo nếu thư viện chưa load sau 3s */
 setTimeout(() => {
   if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined'){
-    toast('⚠️ Thư viện QR đang tải chậm. Vui lòng chờ hoặc tải lại trang.', 5000);
+    toast('⚠️ Thư viện QR chưa load. Kiểm tra 2 file qrcode.min.js & html5-qrcode.min.js đã upload chưa.', 5000);
   }
 }, 3000);
-
 </script>
 </body>
 </html>

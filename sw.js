@@ -3,7 +3,7 @@
    ⚠️ Đổi CACHE version mỗi khi sửa index.html / sw.js để force reload
    =================================================================== */
 
-const CACHE = 'qrox-v15';
+const CACHE = 'qrox-v16';
 
 const CORE = [
   './',

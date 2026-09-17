@@ -245,20 +245,18 @@ button.orange{background:#f59e0b}
     <input id="acc" type="text" placeholder="Số TK (có thể có chữ cái)"
            autocomplete="off" autocapitalize="characters" spellcheck="false"
            style="font-family:ui-monospace,Consolas,monospace;letter-spacing:.5px">
-    <div class="hint">Cho phép chữ + số (VD: 1234567890 hoặc ABC12345)</div>
   </div>
 
   <div class="fg">
-    <label class="f">Chủ tài khoản <span style="font-weight:400">(tuỳ chọn)</span></label>
-    <input id="holder" type="text" placeholder="NGUYEN VAN A" autocomplete="off"
-           style="text-transform:uppercase">
+    <label class="f">Chủ tài khoản</label>
+    <input id="holder" type="text" placeholder="NGUYEN VAN A"
+           autocomplete="off" style="text-transform:uppercase">
   </div>
 
   <div class="fg">
-    <label class="f">Số tiền (VND) <span style="font-weight:400">(tuỳ chọn)</span></label>
+    <label class="f">Số tiền (VND)</label>
     <input id="amt" type="tel" inputmode="numeric"
            placeholder="Để trống = khách tự nhập" autocomplete="off">
-    <div class="hint">Nếu để trống, khách phải tự nhập số tiền khi quét</div>
   </div>
 
   <div class="fg">
@@ -314,9 +312,6 @@ button.orange{background:#f59e0b}
       <button onclick="downloadQR()">
         <span class="ic">💾</span><span>Tải về</span>
       </button>
-    </div>
-    <div class="hint" style="margin-top:8px;text-align:center">
-      Nhấn giữ ảnh QR để mở menu khác
     </div>
     <textarea id="qrString" readonly class="qr-str"
               placeholder="Chuỗi QR sẽ hiện ở đây"></textarea>
@@ -623,7 +618,6 @@ function updateBankHint(){
   );
 
   if (found){
-    // ✅ Logo động + thông tin ngân hàng
     const logoHtml = found.logo
       ? `<img src="${found.logo}" alt="" class="bank-logo-hint"
               onerror="this.style.display='none'">`

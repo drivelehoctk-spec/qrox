@@ -76,7 +76,7 @@ button.orange{background:#f59e0b}
 .info .t{font-weight:700;color:var(--success);margin-bottom:8px;
   display:flex;align-items:center;gap:6px;font-size:13.5px}
 .info .row{display:flex;margin:5px 0;font-size:12.5px;align-items:flex-start}
-.info .lbl{flex:0 0 82px;color:#4b5563;font-weight:500}
+.info .lbl{flex:0 0 110px;color:#4b5563;font-weight:500}
 .info .val{flex:1;font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
   word-break:break-all;color:#111}
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;
@@ -255,20 +255,6 @@ button.orange{background:#f59e0b}
     <div class="counter" id="charCount">0 / 99</div>
   </div>
 
-  <!--
-  <div class="info" id="infoPanel">
-    <div class="t">✅ QR đã đọc thành công</div>
-    <div class="row"><div class="lbl">Ngân hàng:</div><div class="val" id="iBank">—</div></div>
-    <div class="row"><div class="lbl">SWIFT:</div><div class="val" id="iSwift">—</div></div>
-    <div class="row"><div class="lbl">Số TK:</div><div class="val" id="iAcc">—</div></div>
-    <div class="row"><div class="lbl">Chủ TK:</div><div class="val" id="iHolder">—</div></div>
-    <div class="row"><div class="lbl">Số tiền:</div><div class="val" id="iAmt">—</div></div>
-    <div class="row"><div class="lbl">Nội dung:</div><div class="val" id="iContent">—</div></div>
-    <div class="row"><div class="lbl">Chế độ:</div>
-      <div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div>
-    </div>
-  </div>
-  -->
   <div class="info" id="infoPanel">
     <div class="t">✅ QR đã đọc thành công</div>
     <div class="row"><div class="lbl">Số TK:</div><div class="val" id="iAcc">—</div></div>
@@ -279,6 +265,7 @@ button.orange{background:#f59e0b}
       <div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div>
     </div>
   </div>
+
   <label class="chk-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
     <input type="checkbox" id="chkStatic">
     <span>Tạo <b>QR tĩnh</b> — khách <u>không sửa được</u> khi quét</span>
@@ -533,15 +520,6 @@ function getBankByBin(bin){
   return BANKS.find(b => b.bin === bin) || null;
 }
 
-function getBankLabel(bin){
-  if (!bin) return '—';
-  const b = getBankByBin(bin);
-  if (!b) return bin;
-  const parts = [b.bin, '—', b.shortName, `(${b.code})`];
-  if (b.swiftCode) parts.push(`· SWIFT: ${b.swiftCode}`);
-  return parts.join(' ');
-}
-
 /* ===================================================================
    PHẦN 3 — STATE
    =================================================================== */
@@ -578,7 +556,7 @@ function toast(msg, duration = 2200){
 }
 
 /* ===================================================================
-   PHẦN 5 — STATE MACHINE
+   PHẦN 5 — STATE MACHINE (đã sửa: bỏ "giữ nguyên")
    =================================================================== */
 function refreshState(){
   const bank  = bankEl.value.trim();
@@ -594,7 +572,7 @@ function refreshState(){
       amtEl.value.replace(/\D/g, '') !== (lastScannedInfo.amount || '') ||
       msgEl.value.trim() !== lastScannedInfo.content;
 
-    btnGenEl.textContent = changed ? 'Tạo QR mới (đã sửa)' : 'Tạo lại QR (giữ nguyên)';
+    btnGenEl.textContent = changed ? 'Tạo QR mới' : 'Tạo lại QR';
   } else {
     btnGenEl.textContent = 'Tạo mã QR';
   }
@@ -848,7 +826,6 @@ async function pasteImage(){
    PHẦN 10 — DECODE ẢNH TĨNH
    =================================================================== */
 async function decodeImage(img){
-  // Clear form cũ trước
   bankEl.value = '';
   accEl.value = '';
   holderEl.value = '';
@@ -902,7 +879,7 @@ async function decodeImage(img){
 }
 
 /* ===================================================================
-   PHẦN 11 — XỬ LÝ SAU KHI DECODE
+   PHẦN 11 — XỬ LÝ SAU KHI DECODE (đã sửa: gộp shortName vào Số TK)
    =================================================================== */
 function handleDecoded(text){
   if (!text) return;
@@ -929,9 +906,9 @@ function handleDecoded(text){
     };
 
     const bankInfo = getBankByBin(info.bankCode);
-    $('iBank').textContent    = getBankLabel(info.bankCode);
-    $('iSwift').textContent   = bankInfo && bankInfo.swiftCode ? bankInfo.swiftCode : '(không có)';
-    $('iAcc').textContent     = info.account;
+    const bankShortName = bankInfo ? bankInfo.shortName : '';
+
+    $('iAcc').textContent     = info.account + (bankShortName ? ' - ' + bankShortName : '');
     $('iHolder').textContent  = info.accHolder || '(không có)';
     $('iAmt').textContent     = info.amount
       ? Number(info.amount).toLocaleString('vi-VN') + ' ₫'
@@ -963,7 +940,7 @@ function handleDecoded(text){
 }
 
 /* ===================================================================
-   PHẦN 12 — TẠO QR (dùng qrcodejs API)
+   PHẦN 12 — TẠO QR (qrcodejs API)
    =================================================================== */
 function genQR(){
   try {
@@ -1063,8 +1040,6 @@ async function autoCopyQR(){
 /* ===================================================================
    PHẦN 14 — COPY / DOWNLOAD / SHARE
    =================================================================== */
-
-/* Copy ảnh QR vào clipboard */
 async function copyQR(){
   if (!currentQRBlob){ toast('Chưa có QR để sao chép'); return; }
   try {
@@ -1081,7 +1056,6 @@ async function copyQR(){
   }
 }
 
-/* Tải ảnh QR về máy */
 function downloadQR(){
   if (!currentQRBlob){ toast('Chưa có QR để tải'); return; }
   const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
@@ -1095,10 +1069,6 @@ function downloadQR(){
   toast('Đang tải xuống thư mục Downloads...');
 }
 
-/* Chia sẻ QR qua Web Share API
-   - Ưu tiên share cả ảnh + text
-   - Fallback: chỉ share text nếu trình duyệt không hỗ trợ file
-*/
 async function shareQR(){
   if (!currentQRBlob){ toast('Chưa có QR để chia sẻ'); return; }
 
@@ -1111,7 +1081,6 @@ async function shareQR(){
   const filename = `VietQR_${ts}.png`;
 
   try {
-    // Thử share file ảnh trước
     const file = new File([currentQRBlob], filename, { type: 'image/png' });
 
     if (navigator.canShare && navigator.canShare({ files: [file] })){
@@ -1124,7 +1093,6 @@ async function shareQR(){
       return;
     }
 
-    // Fallback: share chuỗi text
     await navigator.share({
       title: 'Mã QR thanh toán',
       text: qrStrEl.value
@@ -1132,7 +1100,6 @@ async function shareQR(){
     toast('✅ Đã chia sẻ chuỗi QR');
 
   } catch (e){
-    // User bấm Cancel trên sheet share → không cần báo lỗi
     if (e.name === 'AbortError') return;
     toast('Không chia sẻ được: ' + e.message);
   }
@@ -1159,7 +1126,6 @@ qrCanvasEl.addEventListener('contextmenu', (e) => {
   openSheet();
 });
 
-/* Enter → Tạo QR */
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && e.target.tagName === 'INPUT'){
     e.preventDefault();
@@ -1170,8 +1136,6 @@ document.addEventListener('keydown', (e) => {
 /* ===================================================================
    PHẦN 16 — KHỞI TẠO
    =================================================================== */
-
-/* Ẩn nút Share nếu trình duyệt không hỗ trợ Web Share API */
 if (!navigator.share){
   const btn = $('btnShare');
   if (btn) btn.style.display = 'none';
@@ -1181,20 +1145,15 @@ if (!navigator.share){
   if (qrActions) qrActions.style.gridTemplateColumns = '1fr 1fr';
 }
 
-/* Service Worker */
 if ('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-/* Khởi tạo form */
 refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
-
-/* Tải danh sách ngân hàng (API → local → cache) */
 loadBanks();
 
-/* Cảnh báo nếu thư viện chưa load sau 3 giây */
 setTimeout(() => {
   if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined'){
     toast('⚠️ Thư viện QR chưa load. Kiểm tra qrcode.min.js & html5-qrcode.min.js.', 5000);

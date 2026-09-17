@@ -8,16 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>QRoX Mobile</title>
 <link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMDA3OGQ3Ii8+PHRleHQgeD0iOTYiIHk9IjEyNCIgZm9udC1zaXplPSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSJib2xkIj5RUjwvdGV4dD48L3N2Zz4=">
 
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="shortcut icon" href="favicon.svg">
-<link rel="apple-touch-icon" href="favicon.svg">
-  
-<!-- ⚠️ Nhúng local — KHÔNG dùng CDN để tránh lỗi MIME / corrupted content 
-<!-- Tạo mã QR -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<!-- Quét mã QR -->
-<!-- <script src="https://unpkg.com/html5-qrcode"></script> -->
+<!-- Nhúng local — không dùng CDN -->
 <script src="qrcode.min.js"></script>
 <script src="html5-qrcode.min.js"></script>
 
@@ -90,16 +83,39 @@ button.green{background:var(--success)}
 .b-static{background:#fee2e2;color:#b91c1c}
 .b-dynamic{background:#dbeafe;color:#1d4ed8}
 
+/* Autocomplete */
+.autocomplete-wrap{position:relative}
+.autocomplete-list{display:none;position:absolute;top:100%;left:0;right:0;
+  background:#fff;border:1px solid var(--border);border-radius:10px;
+  max-height:320px;overflow-y:auto;z-index:500;margin-top:4px;
+  box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.autocomplete-list.show{display:block}
+.autocomplete-item{padding:11px 14px;border-bottom:1px solid var(--border);
+  cursor:pointer;display:flex;flex-direction:column;gap:3px;min-height:44px}
+.autocomplete-item:last-child{border-bottom:none}
+.autocomplete-item:active{background:#f1f3f5}
+.autocomplete-item .l1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.autocomplete-item .bin{color:var(--primary);font-weight:700;font-family:ui-monospace,monospace;font-size:13.5px}
+.autocomplete-item .code{color:#1d4ed8;font-size:11px;font-weight:600;background:#eef3ff;
+  padding:2px 8px;border-radius:5px}
+.autocomplete-item .name{color:#222;font-weight:600;font-size:13px}
+.autocomplete-item .full{color:var(--muted);font-size:11px;line-height:1.3}
+.autocomplete-empty{padding:16px;text-align:center;color:var(--muted);font-size:12.5px}
+
+/* QR output */
 .qr-out{display:none;margin-top:14px;text-align:center}
 .qr-out.show{display:block}
-#qrCanvas{max-width:100%;height:auto;border-radius:12px;border:1px solid var(--border);
-  background:#fff;padding:8px;cursor:pointer;-webkit-user-select:none;user-select:none;
-  -webkit-touch-callout:none;touch-action:manipulation}
+#qrCanvas{display:flex;justify-content:center;align-items:center;min-height:100px;
+  cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  touch-action:manipulation}
+#qrCanvas canvas,#qrCanvas img{max-width:100%;height:auto;border-radius:12px;
+  border:1px solid var(--border);background:#fff;padding:8px;display:block}
 .qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .qr-str{margin-top:10px;font-family:ui-monospace,Consolas,monospace;font-size:11px;
   min-height:56px;background:#f8f9fb}
 .empty{text-align:center;padding:26px 12px;color:#9ca3af;font-size:13px;line-height:1.6}
 
+/* Camera overlay */
 #cam{display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column}
 #cam.show{display:flex}
 #reader{flex:1;overflow:hidden;background:#000;position:relative}
@@ -115,6 +131,7 @@ button.green{background:var(--success)}
   left:20px;right:20px;text-align:center;color:#fff;font-size:12px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);opacity:.85}
 
+/* Sticky action */
 .sticky{position:fixed;bottom:0;left:0;right:0;
   padding:12px 16px calc(12px + var(--safe-bottom));
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
@@ -122,6 +139,7 @@ button.green{background:var(--success)}
 .sticky button{width:100%;font-size:16px;padding:14px;
   box-shadow:0 4px 14px rgba(0,120,215,.35)}
 
+/* Toast */
 #toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;
   transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.9);
   color:#fff;padding:11px 20px;border-radius:24px;font-size:13.5px;
@@ -131,6 +149,7 @@ button.green{background:var(--success)}
   box-shadow:0 8px 24px rgba(0,0,0,.25)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* Bottom sheet */
 #sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;
   align-items:flex-end;justify-content:center}
 #sheet.show{display:flex;animation:fadeIn .2s ease}
@@ -198,7 +217,12 @@ button.green{background:var(--success)}
 
   <div class="fg">
     <label class="f">Mã ngân hàng / BIN</label>
-    <input id="bank" type="tel" inputmode="numeric" placeholder="VD: 970436" autocomplete="off">
+    <div class="autocomplete-wrap">
+      <input id="bank" type="text" placeholder="Gõ BIN / VCB / Vietcombank / SWIFT..."
+             autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <div class="autocomplete-list" id="bankSuggest"></div>
+    </div>
+    <div class="hint" id="bankNameHint" style="color:var(--success)"></div>
   </div>
 
   <div class="fg">
@@ -227,6 +251,7 @@ button.green{background:var(--success)}
   <div class="info" id="infoPanel">
     <div class="t">✅ QR đã đọc thành công</div>
     <div class="row"><div class="lbl">Ngân hàng:</div><div class="val" id="iBank">—</div></div>
+    <div class="row"><div class="lbl">SWIFT:</div><div class="val" id="iSwift">—</div></div>
     <div class="row"><div class="lbl">Số TK:</div><div class="val" id="iAcc">—</div></div>
     <div class="row"><div class="lbl">Chủ TK:</div><div class="val" id="iHolder">—</div></div>
     <div class="row"><div class="lbl">Số tiền:</div><div class="val" id="iAmt">—</div></div>
@@ -234,7 +259,6 @@ button.green{background:var(--success)}
     <div class="row"><div class="lbl">Chế độ:</div><div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div></div>
   </div>
 
-  <!-- ⚠️ NHÃN ĐÃ SỬA: tĩnh = khách không sửa được (không phải "không có số tiền") -->
   <label class="chk-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
     <input type="checkbox" id="chkStatic">
     <span>Tạo <b>QR tĩnh</b> — khách <u>không sửa được</u> khi quét</span>
@@ -258,7 +282,7 @@ button.green{background:var(--success)}
   </div>
 
   <div class="qr-out" id="qrOut">
-    <canvas id="qrCanvas"></canvas>
+    <div id="qrCanvas"></div>
     <div class="qr-actions">
       <button class="green" onclick="copyQR(event)">📋 Sao chép</button>
       <button onclick="downloadQR()">💾 Tải về</button>
@@ -280,7 +304,6 @@ button.green{background:var(--success)}
    VIETQR CORE
    =================================================================== */
 
-/* CRC16-CCITT — chuẩn EMVCo */
 function crc16(s){
   let crc = 0xFFFF, poly = 0x1021;
   for (const ch of s){
@@ -295,12 +318,10 @@ function crc16(s){
   return crc.toString(16).toUpperCase().padStart(4, '0');
 }
 
-/* TLV: tag(2) + length(2) + value */
 function tlv(tag, val){
   return tag + String(val.length).padStart(2, '0') + val;
 }
 
-/* Xoá dấu tiếng Việt + ký tự ngoài ASCII in được */
 function strip(s){
   return (s || '')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -308,7 +329,6 @@ function strip(s){
     .replace(/[^\x20-\x7E]/g, '');
 }
 
-/* Parse chuỗi TLV → object {tag: value} */
 function parseTLV(text){
   const r = {}; let i = 0;
   while (i <= text.length - 4){
@@ -321,13 +341,7 @@ function parseTLV(text){
   return r;
 }
 
-/* ===================================================================
-   BUILD VIETQR — ✅ ĐÃ SỬA
-   Khác biệt duy nhất giữa tĩnh/động là TAG 01:
-     - 'dynamic' → tag 01 = '11'  (khách sửa được)
-     - 'static'  → tag 01 = '12'  (khách KHÔNG sửa được)
-   Tag 54 (số tiền) LUÔN có nếu user nhập — không phân biệt tĩnh/động
-   =================================================================== */
+/* Build VietQR — khác biệt tĩnh/động duy nhất ở tag 01 */
 function buildVietQR({bin, acc, holder = '', amount = '', content = '',
                       method = 'dynamic', includeHolder = false}){
   const isStatic = (method === 'static');
@@ -337,16 +351,16 @@ function buildVietQR({bin, acc, holder = '', amount = '', content = '',
     tlv('00', 'A000000727') + tlv('01', inner) + tlv('02', 'QRIBFTTA')
   );
 
-  // ✅ SỬA: tag 54 LUÔN có nếu nhập tiền — KHÔNG phụ thuộc tĩnh/động
+  // Tag 54 (số tiền) LUÔN có nếu nhập — không phân biệt tĩnh/động
   const amtTLV = (amount && +amount > 0) ? tlv('54', String(+amount)) : '';
 
-  // ✅ Tag 62 cũng luôn có nếu nhập nội dung
+  // Tag 62 (nội dung) luôn có nếu nhập
   const add = content ? tlv('08', strip(content)) : '';
   const addTLV = add ? tlv('62', add) : '6200';
 
   const mName = (includeHolder && holder) ? tlv('59', strip(holder)) : '';
 
-  // ⚠️ ĐIỂM KHÁC DUY NHẤT: tag 01
+  // Khác biệt duy nhất: tag 01
   const init = isStatic ? tlv('01', '12') : tlv('01', '11');
 
   const payload = tlv('00', '01') + init + merchant + tlv('53', '704')
@@ -355,10 +369,6 @@ function buildVietQR({bin, acc, holder = '', amount = '', content = '',
   return withCrc + crc16(withCrc);
 }
 
-/* ===================================================================
-   PARSE VIETQR — ✅ ĐÃ SỬA
-   Tag 01 = '12' → tĩnh; '11' hoặc thiếu → động
-   =================================================================== */
 function parseVietQR(text){
   if (!text || !text.startsWith('000201') || !text.includes('A000000727')) return null;
   const root = parseTLV(text);
@@ -383,7 +393,7 @@ function parseVietQR(text){
     out.content = s['08'] || s['01'] || '';
   }
 
-  // ✅ SỬA: tag 01='12' → tĩnh, ngược lại → động
+  // Tag 01: '12' → tĩnh, '11' hoặc thiếu → động (theo chuẩn EMVCo mặc định tĩnh, nhưng app ưu tiên động khi thiếu)
   if (root['01']) out.isStatic = (root['01'] === '12');
   else            out.isStatic = false;
 
@@ -391,9 +401,135 @@ function parseVietQR(text){
 }
 
 /* ===================================================================
+   DANH SÁCH NGÂN HÀNG — KHÔNG hardcode
+   Thứ tự: API → ./banks.json → localStorage cache
+   =================================================================== */
+let BANKS = [];
+
+function normalize(s){
+  return (s || '').toString().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g,'d').replace(/Đ/g,'d')
+    .replace(/\s+/g,' ').trim();
+}
+
+function mapBankRecord(b){
+  return {
+    bin:       String(b.bin || ''),
+    code:      String(b.code || ''),
+    shortName: String(b.shortName || b.short_name || ''),
+    fullName:  String(b.name || ''),
+    swiftCode: String(b.swift_code || b.swiftCode || ''),
+    logo:      String(b.logo || '')
+  };
+}
+
+async function fetchBanksFromApi(){
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 5000);
+  try {
+    const resp = await fetch('https://api.vietqr.io/v2/banks', { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const json = await resp.json();
+    if (json.code !== '00' || !Array.isArray(json.data) || !json.data.length){
+      throw new Error('Dữ liệu API không hợp lệ');
+    }
+    return json.data.map(mapBankRecord).filter(b => b.bin);
+  } catch (e){
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+async function fetchBanksFromLocalFile(){
+  const resp = await fetch('./banks.json', { cache: 'no-cache' });
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const json = await resp.json();
+  if (json.code !== '00' || !Array.isArray(json.data) || !json.data.length){
+    throw new Error('banks.json không hợp lệ');
+  }
+  return json.data.map(mapBankRecord).filter(b => b.bin);
+}
+
+function saveBanksCache(banks){
+  try {
+    localStorage.setItem('qrox_banks_v4',
+      JSON.stringify({ data: banks, ts: Date.now() }));
+  } catch {}
+}
+
+function loadBanksCache(){
+  try {
+    const cached = localStorage.getItem('qrox_banks_v4');
+    if (!cached) return null;
+    const obj = JSON.parse(cached);
+    if (Array.isArray(obj.data) && obj.data.length &&
+        (Date.now() - obj.ts) < 30*24*60*60*1000){
+      return obj.data;
+    }
+  } catch {}
+  return null;
+}
+
+async function loadBanks(){
+  // 1. API trước (dữ liệu tươi mới)
+  try {
+    const banks = await fetchBanksFromApi();
+    if (banks && banks.length){
+      BANKS = banks;
+      saveBanksCache(BANKS);
+      console.log(`🌐 Loaded ${BANKS.length} banks from API`);
+      return;
+    }
+  } catch (e){
+    console.warn('⚠️ API lỗi:', e.message);
+  }
+
+  // 2. API lỗi → banks.json local
+  try {
+    const banks = await fetchBanksFromLocalFile();
+    if (banks && banks.length){
+      BANKS = banks;
+      saveBanksCache(BANKS);
+      console.log(`📄 API lỗi → loaded ${BANKS.length} banks from banks.json`);
+      return;
+    }
+  } catch (e){
+    console.warn('⚠️ banks.json lỗi:', e.message);
+  }
+
+  // 3. Cả 2 lỗi → cache cũ
+  const cached = loadBanksCache();
+  if (cached){
+    BANKS = cached;
+    console.log(`📦 API + local đều lỗi → dùng cache (${BANKS.length} banks)`);
+    return;
+  }
+
+  // 4. Không có dữ liệu — vẫn cho nhập BIN thủ công
+  BANKS = [];
+  console.warn('⚠️ Không tải được danh sách ngân hàng. Nhập BIN thủ công.');
+}
+
+/* Tra BIN → object ngân hàng */
+function getBankByBin(bin){
+  return BANKS.find(b => b.bin === bin) || null;
+}
+
+/* Format đầy đủ: 970436 — Vietcombank (VCB) · SWIFT: BFTVVNVX */
+function getBankLabel(bin){
+  if (!bin) return '—';
+  const b = getBankByBin(bin);
+  if (!b) return bin;
+  const parts = [b.bin, '—', b.shortName, `(${b.code})`];
+  if (b.swiftCode) parts.push(`· SWIFT: ${b.swiftCode}`);
+  return parts.join(' ');
+}
+
+/* ===================================================================
    STATE
    =================================================================== */
-let lastScannedText = null;
 let lastScannedInfo = null;
 let currentQRBlob   = null;
 let scanner         = null;
@@ -427,7 +563,7 @@ function toast(msg, duration = 2200){
 }
 
 /* ===================================================================
-   STATE MACHINE — cập nhật nhãn nút Tạo QR
+   STATE MACHINE
    =================================================================== */
 function refreshState(){
   const bank  = bankEl.value.trim();
@@ -451,7 +587,137 @@ function refreshState(){
 
 FORM_IDS.forEach(id => $(id).addEventListener('input', refreshState));
 
-/* Checkbox tĩnh/động — nhãn đã sửa cho đúng ý nghĩa */
+/* ===================================================================
+   AUTOCOMPLETE NGÂN HÀNG
+   =================================================================== */
+const bankSuggestEl = $('bankSuggest');
+const bankHintEl    = $('bankNameHint');
+
+function updateBankHint(){
+  if (!bankHintEl) return;
+  const v = bankEl.value.trim();
+  if (!v){ bankHintEl.textContent = ''; return; }
+
+  if (BANKS.length === 0){
+    if (/^\d{6}$/.test(v)){
+      bankHintEl.textContent = '🏦 BIN: ' + v + ' (chưa tải được danh sách)';
+      bankHintEl.style.color = 'var(--muted)';
+    } else {
+      bankHintEl.textContent = '⚠️ Chưa tải được danh sách ngân hàng';
+      bankHintEl.style.color = 'var(--warning)';
+    }
+    return;
+  }
+
+  const nv = normalize(v);
+  const found = BANKS.find(b =>
+    b.bin === v ||
+    normalize(b.code)      === nv ||
+    normalize(b.shortName) === nv ||
+    normalize(b.fullName)  === nv ||
+    normalize(b.swiftCode) === nv
+  );
+
+  if (found){
+    bankHintEl.innerHTML = `🏦 <b>${found.bin}</b> · ${found.shortName} (${found.code})` +
+                           (found.swiftCode ? ` · SWIFT: <code>${found.swiftCode}</code>` : '') +
+                           `<br><span style="color:var(--muted);font-size:10.5px">${found.fullName}</span>`;
+    bankHintEl.style.color = 'var(--success)';
+  } else if (/^\d{6}$/.test(v)){
+    bankHintEl.textContent = '⚠️ BIN không có trong danh sách';
+    bankHintEl.style.color = 'var(--warning)';
+  } else {
+    bankHintEl.textContent = '';
+  }
+}
+
+function renderBankSuggest(query){
+  const q = normalize(query).trim();
+  if (!q){
+    bankSuggestEl.classList.remove('show');
+    bankSuggestEl.innerHTML = '';
+    return;
+  }
+
+  if (BANKS.length === 0){
+    bankSuggestEl.innerHTML = '<div class="autocomplete-empty">Chưa tải được danh sách ngân hàng. Vui lòng nhập BIN thủ công.</div>';
+    bankSuggestEl.classList.add('show');
+    return;
+  }
+
+  const matches = BANKS.filter(b =>
+    b.bin.includes(q) ||
+    normalize(b.code).includes(q) ||
+    normalize(b.shortName).includes(q) ||
+    normalize(b.fullName).includes(q) ||
+    normalize(b.swiftCode).includes(q)
+  ).slice(0, 15);
+
+  if (!matches.length){
+    bankSuggestEl.innerHTML = '<div class="autocomplete-empty">Không tìm thấy ngân hàng</div>';
+    bankSuggestEl.classList.add('show');
+    return;
+  }
+
+  bankSuggestEl.innerHTML = matches.map(b => `
+    <div class="autocomplete-item" data-bin="${b.bin}">
+      <div class="l1">
+        <span class="bin">${b.bin}</span>
+        <span class="code">${b.code || ''}</span>
+      </div>
+      <div class="name">${b.shortName || ''}${b.swiftCode ? ` <span style="color:#888;font-weight:400;font-size:11px">· ${b.swiftCode}</span>` : ''}</div>
+      <div class="full">${b.fullName || ''}</div>
+    </div>
+  `).join('');
+
+  bankSuggestEl.classList.add('show');
+
+  bankSuggestEl.querySelectorAll('.autocomplete-item').forEach(el => {
+    el.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      const bin = el.getAttribute('data-bin');
+      bankEl.value = bin;
+      bankSuggestEl.classList.remove('show');
+      bankSuggestEl.innerHTML = '';
+      updateBankHint();
+      refreshState();
+      bankEl.blur();
+    });
+  });
+}
+
+bankEl.addEventListener('input', () => {
+  renderBankSuggest(bankEl.value);
+  updateBankHint();
+});
+
+bankEl.addEventListener('focus', () => {
+  if (bankEl.value.trim()) renderBankSuggest(bankEl.value);
+});
+
+bankEl.addEventListener('blur', () => {
+  setTimeout(() => bankSuggestEl.classList.remove('show'), 200);
+
+  const v = bankEl.value.trim();
+  if (!v || /^\d{6}$/.test(v)) return;
+
+  const nv = normalize(v);
+  const found = BANKS.find(b =>
+    normalize(b.code)      === nv ||
+    normalize(b.shortName) === nv ||
+    normalize(b.fullName)  === nv ||
+    normalize(b.swiftCode) === nv
+  );
+  if (found){
+    bankEl.value = found.bin;
+    updateBankHint();
+    refreshState();
+  }
+});
+
+/* ===================================================================
+   CHECKBOX TĨNH/ĐỘNG
+   =================================================================== */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
   if (chkStaticEl.checked){
@@ -473,7 +739,7 @@ msgEl.addEventListener('input', () => {
   else if (len > 60) el.classList.add('warn');
 });
 
-/* Format số tiền có dấu chấm */
+/* Format số tiền */
 let formattingAmt = false;
 amtEl.addEventListener('input', () => {
   if (formattingAmt) return;
@@ -497,9 +763,7 @@ amtEl.addEventListener('input', () => {
    CAMERA
    =================================================================== */
 function openCamera(){
-  const view = $('cam');
-  view.classList.add('show');
-
+  $('cam').classList.add('show');
   if (scanner){ scanner = null; }
   scanner = new Html5Qrcode('reader');
   scanner.start(
@@ -526,7 +790,7 @@ function closeCamera(){
 }
 
 /* ===================================================================
-   CHỌN ẢNH TỪ THƯ VIỆN
+   CHỌN ẢNH
    =================================================================== */
 function pickImage(){ $('filePick').click(); }
 
@@ -543,7 +807,7 @@ $('filePick').addEventListener('change', function(){
 });
 
 /* ===================================================================
-   PASTE ẢNH TỪ CLIPBOARD
+   PASTE ẢNH
    =================================================================== */
 async function pasteImage(){
   try {
@@ -573,19 +837,60 @@ async function pasteImage(){
 /* ===================================================================
    DECODE ẢNH TĨNH
    =================================================================== */
-function decodeImage(img){
-  let hidden = $('fileScanner');
-  if (!hidden){
-    hidden = document.createElement('div');
-    hidden.id = 'fileScanner';
-    hidden.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px';
-    document.body.appendChild(hidden);
+async function decodeImage(img){
+  // Clear form cũ
+  bankEl.value = '';
+  accEl.value = '';
+  holderEl.value = '';
+  amtEl.value = '';
+  msgEl.value = '';
+  qrStrEl.value = '';
+  qrOutEl.classList.remove('show');
+  noQREl.style.display = '';
+  $('infoPanel').classList.remove('show');
+  lastScannedInfo = null;
+  currentQRBlob = null;
+  updateBankHint();
+  refreshState();
+
+  toast('⏳ Đang đọc QR từ ảnh...', 1500);
+
+  let box = document.getElementById('fileScannerBox');
+  if (!box){
+    box = document.createElement('div');
+    box.id = 'fileScannerBox';
+    box.style.cssText = 'position:fixed;bottom:0;right:0;width:200px;height:200px;' +
+                        'opacity:0.01;pointer-events:none;overflow:hidden;z-index:-1';
+    document.body.appendChild(box);
   }
-  const tmp = new Html5Qrcode('fileScanner');
-  tmp.scanFile(img, false)
-    .then(text => handleDecoded(text))
-    .catch(() => toast('Không tìm thấy QR trong ảnh này'))
-    .finally(() => { try { tmp.clear(); } catch {} });
+  box.innerHTML = '';
+
+  const tmp = new Html5Qrcode('fileScannerBox', {
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.QR_CODE,
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.ITF
+    ],
+    experimentalFeatures: {
+      useBarCodeDetectorIfSupported: true
+    },
+    verbose: false
+  });
+
+  try {
+    const text = await tmp.scanFile(img, false);
+    await tmp.clear();
+    handleDecoded(text);
+  } catch (err){
+    try { await tmp.clear(); } catch {}
+    console.warn('Decode ảnh thất bại:', err);
+    toast('❌ Không tìm thấy QR trong ảnh này. Thử ảnh rõ hơn hoặc cắt sát QR.', 3500);
+  }
 }
 
 /* ===================================================================
@@ -594,7 +899,6 @@ function decodeImage(img){
 function handleDecoded(text){
   if (!text) return;
   text = text.trim().replace(/[\r\n]+/g, '').replace(/\u200B/g, '');
-  lastScannedText = text;
 
   const info = parseVietQR(text);
 
@@ -605,7 +909,6 @@ function handleDecoded(text){
     amtEl.value    = info.amount ? Number(info.amount).toLocaleString('vi-VN') : '';
     msgEl.value    = info.content || '';
 
-    // ✅ Sync checkbox tĩnh/động theo tag 01 của QR gốc
     chkStaticEl.checked = info.isStatic;
     chkStaticEl.dispatchEvent(new Event('change'));
 
@@ -617,7 +920,9 @@ function handleDecoded(text){
       content:   info.content || ''
     };
 
-    $('iBank').textContent    = info.bankCode;
+    const bankInfo = getBankByBin(info.bankCode);
+    $('iBank').textContent    = getBankLabel(info.bankCode);
+    $('iSwift').textContent   = bankInfo && bankInfo.swiftCode ? bankInfo.swiftCode : '(không có)';
     $('iAcc').textContent     = info.account;
     $('iHolder').textContent  = info.accHolder || '(không có)';
     $('iAmt').textContent     = info.amount
@@ -631,31 +936,28 @@ function handleDecoded(text){
 
     $('infoPanel').classList.add('show');
     msgEl.dispatchEvent(new Event('input'));
+    updateBankHint();
 
     toast('✅ Đã đọc QR — bạn có thể sửa rồi tạo mới');
-
   } else {
     lastScannedInfo = null;
     $('infoPanel').classList.remove('show');
     qrStrEl.value = text;
-    toast('QR không phải VietQR — chỉ hiển thị chuỗi');
+    bankEl.value = '';
+    accEl.value = '';
+    holderEl.value = '';
+    amtEl.value = '';
+    msgEl.value = '';
+    toast('⚠️ QR không phải VietQR — chỉ hiển thị chuỗi', 3000);
   }
 
   refreshState();
-
-  if (info){
-    setTimeout(() => {
-      document.querySelector('.card:nth-child(2)')?.scrollIntoView({
-        behavior: 'smooth', block: 'start'
-      });
-    }, 300);
-  }
 }
 
 /* ===================================================================
-   TẠO QR
+   TẠO QR (dùng qrcodejs API)
    =================================================================== */
-async function genQR(){
+function genQR(){
   try {
     const amountRaw = amtEl.value.replace(/\D/g, '');
     const payload = {
@@ -681,23 +983,44 @@ async function genQR(){
     const qr = buildVietQR(payload);
     qrStrEl.value = qr;
 
-    await QRCode.toCanvas(qrCanvasEl, qr, {
+    // qrcodejs render vào container (tự tạo canvas bên trong)
+    qrCanvasEl.innerHTML = '';
+    new QRCode(qrCanvasEl, {
+      text: qr,
       width: 640,
-      margin: 2,
-      errorCorrectionLevel: 'M',
-      color: { dark: '#000000', light: '#ffffff' }
+      height: 640,
+      correctLevel: QRCode.CorrectLevel.M,
+      colorDark: '#000000',
+      colorLight: '#ffffff'
     });
 
     noQREl.style.display = 'none';
     qrOutEl.classList.add('show');
 
-    qrCanvasEl.toBlob(b => { currentQRBlob = b; }, 'image/png');
+    // Đợi render xong rồi lấy blob
+    setTimeout(async () => {
+      const innerCanvas = qrCanvasEl.querySelector('canvas');
+      const innerImg    = qrCanvasEl.querySelector('img');
 
-    setTimeout(() => autoCopyQR(), 120);
+      if (innerCanvas){
+        innerCanvas.toBlob(b => {
+          currentQRBlob = b;
+          autoCopyQR();
+        }, 'image/png');
+      } else if (innerImg && innerImg.src){
+        try {
+          const resp = await fetch(innerImg.src);
+          currentQRBlob = await resp.blob();
+          autoCopyQR();
+        } catch { autoCopyQR(); }
+      } else {
+        autoCopyQR();
+      }
+    }, 250);
 
     setTimeout(() => {
       qrOutEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 200);
+    }, 300);
 
   } catch (e){
     toast('Lỗi tạo QR: ' + e.message);
@@ -705,7 +1028,7 @@ async function genQR(){
 }
 
 /* ===================================================================
-   AUTO-COPY SAU KHI TẠO
+   AUTO-COPY
    =================================================================== */
 async function autoCopyQR(){
   try {
@@ -732,7 +1055,7 @@ async function autoCopyQR(){
 }
 
 /* ===================================================================
-   COPY / TẢI QR
+   COPY / TẢI
    =================================================================== */
 async function copyQR(){
   if (!currentQRBlob){ toast('Chưa có QR để sao chép'); return; }
@@ -801,11 +1124,12 @@ if ('serviceWorker' in navigator){
 refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
+loadBanks();   // Tải danh sách ngân hàng: API → local → cache
 
-/* Cảnh báo nếu thư viện chưa load sau 3s */
+/* Cảnh báo nếu thư viện chưa load */
 setTimeout(() => {
   if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined'){
-    toast('⚠️ Thư viện QR chưa load. Kiểm tra 2 file qrcode.min.js & html5-qrcode.min.js đã upload chưa.', 5000);
+    toast('⚠️ Thư viện QR chưa load. Kiểm tra qrcode.min.js & html5-qrcode.min.js.', 5000);
   }
 }, 3000);
 </script>

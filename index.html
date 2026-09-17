@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMDA3OGQ3Ii8+PHRleHQgeD0iOTYiIHk9IjEyNCIgZm9udC1zaXplPSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSJib2xkIj5RUjwvdGV4dD48L3N2Zz4=">
 
-<!-- Nhúng local — không dùng CDN -->
+<!-- Nhúng local — không dùng CDN để tránh lỗi MIME -->
 <script src="qrcode.min.js"></script>
 <script src="html5-qrcode.min.js"></script>
 
@@ -57,6 +57,7 @@ button:active:not(:disabled){transform:scale(.97);opacity:.85}
 button:disabled{background:#cbd0d6;cursor:not-allowed;box-shadow:none}
 button.sec{background:#f1f3f5;color:#222;border:1px solid var(--border)}
 button.green{background:var(--success)}
+button.orange{background:#f59e0b}
 
 .src-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
 .src-btn{flex-direction:column;padding:14px 6px;font-size:12px;line-height:1.4;
@@ -83,7 +84,6 @@ button.green{background:var(--success)}
 .b-static{background:#fee2e2;color:#b91c1c}
 .b-dynamic{background:#dbeafe;color:#1d4ed8}
 
-/* Autocomplete */
 .autocomplete-wrap{position:relative}
 .autocomplete-list{display:none;position:absolute;top:100%;left:0;right:0;
   background:#fff;border:1px solid var(--border);border-radius:10px;
@@ -95,14 +95,14 @@ button.green{background:var(--success)}
 .autocomplete-item:last-child{border-bottom:none}
 .autocomplete-item:active{background:#f1f3f5}
 .autocomplete-item .l1{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.autocomplete-item .bin{color:var(--primary);font-weight:700;font-family:ui-monospace,monospace;font-size:13.5px}
-.autocomplete-item .code{color:#1d4ed8;font-size:11px;font-weight:600;background:#eef3ff;
-  padding:2px 8px;border-radius:5px}
+.autocomplete-item .bin{color:var(--primary);font-weight:700;
+  font-family:ui-monospace,monospace;font-size:13.5px}
+.autocomplete-item .code{color:#1d4ed8;font-size:11px;font-weight:600;
+  background:#eef3ff;padding:2px 8px;border-radius:5px}
 .autocomplete-item .name{color:#222;font-weight:600;font-size:13px}
 .autocomplete-item .full{color:var(--muted);font-size:11px;line-height:1.3}
 .autocomplete-empty{padding:16px;text-align:center;color:var(--muted);font-size:12.5px}
 
-/* QR output */
 .qr-out{display:none;margin-top:14px;text-align:center}
 .qr-out.show{display:block}
 #qrCanvas{display:flex;justify-content:center;align-items:center;min-height:100px;
@@ -110,12 +110,15 @@ button.green{background:var(--success)}
   touch-action:manipulation}
 #qrCanvas canvas,#qrCanvas img{max-width:100%;height:auto;border-radius:12px;
   border:1px solid var(--border);background:#fff;padding:8px;display:block}
-.qr-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+
+.qr-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px}
+.qr-actions button{padding:10px 6px;font-size:12px;gap:4px;flex-direction:column;min-height:56px}
+.qr-actions button .ic{font-size:18px;line-height:1}
+
 .qr-str{margin-top:10px;font-family:ui-monospace,Consolas,monospace;font-size:11px;
   min-height:56px;background:#f8f9fb}
 .empty{text-align:center;padding:26px 12px;color:#9ca3af;font-size:13px;line-height:1.6}
 
-/* Camera overlay */
 #cam{display:none;position:fixed;inset:0;background:#000;z-index:1000;flex-direction:column}
 #cam.show{display:flex}
 #reader{flex:1;overflow:hidden;background:#000;position:relative}
@@ -131,7 +134,6 @@ button.green{background:var(--success)}
   left:20px;right:20px;text-align:center;color:#fff;font-size:12px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);opacity:.85}
 
-/* Sticky action */
 .sticky{position:fixed;bottom:0;left:0;right:0;
   padding:12px 16px calc(12px + var(--safe-bottom));
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
@@ -139,7 +141,6 @@ button.green{background:var(--success)}
 .sticky button{width:100%;font-size:16px;padding:14px;
   box-shadow:0 4px 14px rgba(0,120,215,.35)}
 
-/* Toast */
 #toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;
   transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.9);
   color:#fff;padding:11px 20px;border-radius:24px;font-size:13.5px;
@@ -149,7 +150,6 @@ button.green{background:var(--success)}
   box-shadow:0 8px 24px rgba(0,0,0,.25)}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Bottom sheet */
 #sheet{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;
   align-items:flex-end;justify-content:center}
 #sheet.show{display:flex;animation:fadeIn .2s ease}
@@ -185,6 +185,9 @@ button.green{background:var(--success)}
     <div class="grab"></div>
     <button onclick="copyQR();closeSheet()">
       <span style="margin-right:12px">📋</span> Sao chép ảnh QR
+    </button>
+    <button id="sheetShareBtn" onclick="shareQR();closeSheet()">
+      <span style="margin-right:12px">📤</span> Chia sẻ
     </button>
     <button onclick="downloadQR();closeSheet()">
       <span style="margin-right:12px">💾</span> Tải về máy
@@ -227,7 +230,10 @@ button.green{background:var(--success)}
 
   <div class="fg">
     <label class="f">Số tài khoản</label>
-    <input id="acc" type="tel" inputmode="numeric" placeholder="Số tài khoản" autocomplete="off">
+    <input id="acc" type="text" placeholder="Số TK (có thể có chữ cái)"
+           autocomplete="off" autocapitalize="characters" spellcheck="false"
+           style="font-family:ui-monospace,Consolas,monospace;letter-spacing:.5px">
+    <div class="hint">Cho phép chữ + số (VD: 1234567890 hoặc ABC12345)</div>
   </div>
 
   <div class="fg">
@@ -238,7 +244,8 @@ button.green{background:var(--success)}
 
   <div class="fg">
     <label class="f">Số tiền (VND) <span style="font-weight:400">(tuỳ chọn)</span></label>
-    <input id="amt" type="tel" inputmode="numeric" placeholder="Để trống = khách tự nhập" autocomplete="off">
+    <input id="amt" type="tel" inputmode="numeric"
+           placeholder="Để trống = khách tự nhập" autocomplete="off">
     <div class="hint">Nếu để trống, khách phải tự nhập số tiền khi quét</div>
   </div>
 
@@ -256,20 +263,24 @@ button.green{background:var(--success)}
     <div class="row"><div class="lbl">Chủ TK:</div><div class="val" id="iHolder">—</div></div>
     <div class="row"><div class="lbl">Số tiền:</div><div class="val" id="iAmt">—</div></div>
     <div class="row"><div class="lbl">Nội dung:</div><div class="val" id="iContent">—</div></div>
-    <div class="row"><div class="lbl">Chế độ:</div><div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div></div>
+    <div class="row"><div class="lbl">Chế độ:</div>
+      <div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div>
+    </div>
   </div>
 
   <label class="chk-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
     <input type="checkbox" id="chkStatic">
     <span>Tạo <b>QR tĩnh</b> — khách <u>không sửa được</u> khi quét</span>
   </label>
-  <div class="hint" id="modeHint" style="color:var(--success);margin-top:-2px;margin-bottom:4px">
+  <div class="hint" id="modeHint"
+       style="color:var(--success);margin-top:-2px;margin-bottom:4px">
     Mã động — khách có thể sửa số tiền &amp; nội dung khi quét
   </div>
 
   <label class="chk-row">
     <input type="checkbox" id="chkHolder">
-    <span>Hiện tên chủ TK trong chuỗi QR <span style="color:#888;font-weight:400">(mặc định ẩn)</span></span>
+    <span>Hiện tên chủ TK trong chuỗi QR
+      <span style="color:#888;font-weight:400">(mặc định ẩn)</span></span>
   </label>
 </div>
 
@@ -284,8 +295,15 @@ button.green{background:var(--success)}
   <div class="qr-out" id="qrOut">
     <div id="qrCanvas"></div>
     <div class="qr-actions">
-      <button class="green" onclick="copyQR(event)">📋 Sao chép</button>
-      <button onclick="downloadQR()">💾 Tải về</button>
+      <button class="green" onclick="copyQR()">
+        <span class="ic">📋</span><span>Sao chép</span>
+      </button>
+      <button class="orange" id="btnShare" onclick="shareQR()">
+        <span class="ic">📤</span><span>Chia sẻ</span>
+      </button>
+      <button onclick="downloadQR()">
+        <span class="ic">💾</span><span>Tải về</span>
+      </button>
     </div>
     <div class="hint" style="margin-top:8px;text-align:center">
       Nhấn giữ ảnh QR để mở menu khác
@@ -301,7 +319,7 @@ button.green{background:var(--success)}
 
 <script>
 /* ===================================================================
-   VIETQR CORE
+   PHẦN 1 — VIETQR CORE
    =================================================================== */
 
 function crc16(s){
@@ -341,7 +359,7 @@ function parseTLV(text){
   return r;
 }
 
-/* Build VietQR — khác biệt tĩnh/động duy nhất ở tag 01 */
+/* Build VietQR — tag 01 khác biệt duy nhất giữa tĩnh/động */
 function buildVietQR({bin, acc, holder = '', amount = '', content = '',
                       method = 'dynamic', includeHolder = false}){
   const isStatic = (method === 'static');
@@ -351,16 +369,11 @@ function buildVietQR({bin, acc, holder = '', amount = '', content = '',
     tlv('00', 'A000000727') + tlv('01', inner) + tlv('02', 'QRIBFTTA')
   );
 
-  // Tag 54 (số tiền) LUÔN có nếu nhập — không phân biệt tĩnh/động
   const amtTLV = (amount && +amount > 0) ? tlv('54', String(+amount)) : '';
-
-  // Tag 62 (nội dung) luôn có nếu nhập
   const add = content ? tlv('08', strip(content)) : '';
   const addTLV = add ? tlv('62', add) : '6200';
-
   const mName = (includeHolder && holder) ? tlv('59', strip(holder)) : '';
 
-  // Khác biệt duy nhất: tag 01
   const init = isStatic ? tlv('01', '12') : tlv('01', '11');
 
   const payload = tlv('00', '01') + init + merchant + tlv('53', '704')
@@ -392,8 +405,6 @@ function parseVietQR(text){
     const s = parseTLV(root['62']);
     out.content = s['08'] || s['01'] || '';
   }
-
-  // Tag 01: '12' → tĩnh, '11' hoặc thiếu → động (theo chuẩn EMVCo mặc định tĩnh, nhưng app ưu tiên động khi thiếu)
   if (root['01']) out.isStatic = (root['01'] === '12');
   else            out.isStatic = false;
 
@@ -401,8 +412,7 @@ function parseVietQR(text){
 }
 
 /* ===================================================================
-   DANH SÁCH NGÂN HÀNG — KHÔNG hardcode
-   Thứ tự: API → ./banks.json → localStorage cache
+   PHẦN 2 — DANH SÁCH NGÂN HÀNG (API → local → cache)
    =================================================================== */
 let BANKS = [];
 
@@ -473,7 +483,6 @@ function loadBanksCache(){
 }
 
 async function loadBanks(){
-  // 1. API trước (dữ liệu tươi mới)
   try {
     const banks = await fetchBanksFromApi();
     if (banks && banks.length){
@@ -486,7 +495,6 @@ async function loadBanks(){
     console.warn('⚠️ API lỗi:', e.message);
   }
 
-  // 2. API lỗi → banks.json local
   try {
     const banks = await fetchBanksFromLocalFile();
     if (banks && banks.length){
@@ -499,7 +507,6 @@ async function loadBanks(){
     console.warn('⚠️ banks.json lỗi:', e.message);
   }
 
-  // 3. Cả 2 lỗi → cache cũ
   const cached = loadBanksCache();
   if (cached){
     BANKS = cached;
@@ -507,17 +514,14 @@ async function loadBanks(){
     return;
   }
 
-  // 4. Không có dữ liệu — vẫn cho nhập BIN thủ công
   BANKS = [];
   console.warn('⚠️ Không tải được danh sách ngân hàng. Nhập BIN thủ công.');
 }
 
-/* Tra BIN → object ngân hàng */
 function getBankByBin(bin){
   return BANKS.find(b => b.bin === bin) || null;
 }
 
-/* Format đầy đủ: 970436 — Vietcombank (VCB) · SWIFT: BFTVVNVX */
 function getBankLabel(bin){
   if (!bin) return '—';
   const b = getBankByBin(bin);
@@ -528,7 +532,7 @@ function getBankLabel(bin){
 }
 
 /* ===================================================================
-   STATE
+   PHẦN 3 — STATE
    =================================================================== */
 let lastScannedInfo = null;
 let currentQRBlob   = null;
@@ -551,7 +555,7 @@ const noQREl      = $('noQR');
 const qrStrEl     = $('qrString');
 
 /* ===================================================================
-   TOAST
+   PHẦN 4 — TOAST
    =================================================================== */
 let toastTimer;
 function toast(msg, duration = 2200){
@@ -563,7 +567,7 @@ function toast(msg, duration = 2200){
 }
 
 /* ===================================================================
-   STATE MACHINE
+   PHẦN 5 — STATE MACHINE
    =================================================================== */
 function refreshState(){
   const bank  = bankEl.value.trim();
@@ -588,7 +592,7 @@ function refreshState(){
 FORM_IDS.forEach(id => $(id).addEventListener('input', refreshState));
 
 /* ===================================================================
-   AUTOCOMPLETE NGÂN HÀNG
+   PHẦN 6 — AUTOCOMPLETE NGÂN HÀNG
    =================================================================== */
 const bankSuggestEl = $('bankSuggest');
 const bankHintEl    = $('bankNameHint');
@@ -620,8 +624,8 @@ function updateBankHint(){
 
   if (found){
     bankHintEl.innerHTML = `🏦 <b>${found.bin}</b> · ${found.shortName} (${found.code})` +
-                           (found.swiftCode ? ` · SWIFT: <code>${found.swiftCode}</code>` : '') +
-                           `<br><span style="color:var(--muted);font-size:10.5px">${found.fullName}</span>`;
+      (found.swiftCode ? ` · SWIFT: <code>${found.swiftCode}</code>` : '') +
+      `<br><span style="color:var(--muted);font-size:10.5px">${found.fullName}</span>`;
     bankHintEl.style.color = 'var(--success)';
   } else if (/^\d{6}$/.test(v)){
     bankHintEl.textContent = '⚠️ BIN không có trong danh sách';
@@ -716,7 +720,7 @@ bankEl.addEventListener('blur', () => {
 });
 
 /* ===================================================================
-   CHECKBOX TĨNH/ĐỘNG
+   PHẦN 7 — CHECKBOX TĨNH/ĐỘNG + ĐẾM KÝ TỰ + FORMAT TIỀN
    =================================================================== */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
@@ -729,7 +733,6 @@ chkStaticEl.addEventListener('change', () => {
   }
 });
 
-/* Đếm ký tự */
 msgEl.addEventListener('input', () => {
   const len = msgEl.value.length;
   const el = $('charCount');
@@ -739,7 +742,6 @@ msgEl.addEventListener('input', () => {
   else if (len > 60) el.classList.add('warn');
 });
 
-/* Format số tiền */
 let formattingAmt = false;
 amtEl.addEventListener('input', () => {
   if (formattingAmt) return;
@@ -760,7 +762,7 @@ amtEl.addEventListener('input', () => {
 });
 
 /* ===================================================================
-   CAMERA
+   PHẦN 8 — CAMERA
    =================================================================== */
 function openCamera(){
   $('cam').classList.add('show');
@@ -790,7 +792,7 @@ function closeCamera(){
 }
 
 /* ===================================================================
-   CHỌN ẢNH
+   PHẦN 9 — CHỌN ẢNH / PASTE ẢNH
    =================================================================== */
 function pickImage(){ $('filePick').click(); }
 
@@ -806,9 +808,6 @@ $('filePick').addEventListener('change', function(){
   img.src = url;
 });
 
-/* ===================================================================
-   PASTE ẢNH
-   =================================================================== */
 async function pasteImage(){
   try {
     if (!navigator.clipboard || !navigator.clipboard.read){
@@ -835,10 +834,10 @@ async function pasteImage(){
 }
 
 /* ===================================================================
-   DECODE ẢNH TĨNH
+   PHẦN 10 — DECODE ẢNH TĨNH
    =================================================================== */
 async function decodeImage(img){
-  // Clear form cũ
+  // Clear form cũ trước
   bankEl.value = '';
   accEl.value = '';
   holderEl.value = '';
@@ -876,9 +875,7 @@ async function decodeImage(img){
       Html5QrcodeSupportedFormats.UPC_E,
       Html5QrcodeSupportedFormats.ITF
     ],
-    experimentalFeatures: {
-      useBarCodeDetectorIfSupported: true
-    },
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
     verbose: false
   });
 
@@ -894,7 +891,7 @@ async function decodeImage(img){
 }
 
 /* ===================================================================
-   SAU KHI DECODE
+   PHẦN 11 — XỬ LÝ SAU KHI DECODE
    =================================================================== */
 function handleDecoded(text){
   if (!text) return;
@@ -955,7 +952,7 @@ function handleDecoded(text){
 }
 
 /* ===================================================================
-   TẠO QR (dùng qrcodejs API)
+   PHẦN 12 — TẠO QR (dùng qrcodejs API)
    =================================================================== */
 function genQR(){
   try {
@@ -983,7 +980,6 @@ function genQR(){
     const qr = buildVietQR(payload);
     qrStrEl.value = qr;
 
-    // qrcodejs render vào container (tự tạo canvas bên trong)
     qrCanvasEl.innerHTML = '';
     new QRCode(qrCanvasEl, {
       text: qr,
@@ -997,7 +993,6 @@ function genQR(){
     noQREl.style.display = 'none';
     qrOutEl.classList.add('show');
 
-    // Đợi render xong rồi lấy blob
     setTimeout(async () => {
       const innerCanvas = qrCanvasEl.querySelector('canvas');
       const innerImg    = qrCanvasEl.querySelector('img');
@@ -1028,7 +1023,7 @@ function genQR(){
 }
 
 /* ===================================================================
-   AUTO-COPY
+   PHẦN 13 — AUTO-COPY
    =================================================================== */
 async function autoCopyQR(){
   try {
@@ -1055,8 +1050,10 @@ async function autoCopyQR(){
 }
 
 /* ===================================================================
-   COPY / TẢI
+   PHẦN 14 — COPY / DOWNLOAD / SHARE
    =================================================================== */
+
+/* Copy ảnh QR vào clipboard */
 async function copyQR(){
   if (!currentQRBlob){ toast('Chưa có QR để sao chép'); return; }
   try {
@@ -1073,6 +1070,7 @@ async function copyQR(){
   }
 }
 
+/* Tải ảnh QR về máy */
 function downloadQR(){
   if (!currentQRBlob){ toast('Chưa có QR để tải'); return; }
   const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
@@ -1086,8 +1084,51 @@ function downloadQR(){
   toast('Đang tải xuống thư mục Downloads...');
 }
 
+/* Chia sẻ QR qua Web Share API
+   - Ưu tiên share cả ảnh + text
+   - Fallback: chỉ share text nếu trình duyệt không hỗ trợ file
+*/
+async function shareQR(){
+  if (!currentQRBlob){ toast('Chưa có QR để chia sẻ'); return; }
+
+  if (!navigator.share){
+    toast('Trình duyệt không hỗ trợ chia sẻ. Dùng "Tải về" hoặc "Sao chép" thay thế.', 3000);
+    return;
+  }
+
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  const filename = `VietQR_${ts}.png`;
+
+  try {
+    // Thử share file ảnh trước
+    const file = new File([currentQRBlob], filename, { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
+      await navigator.share({
+        files: [file],
+        title: 'Mã QR thanh toán',
+        text: 'Mã VietQR thanh toán'
+      });
+      toast('✅ Đã chia sẻ ảnh QR');
+      return;
+    }
+
+    // Fallback: share chuỗi text
+    await navigator.share({
+      title: 'Mã QR thanh toán',
+      text: qrStrEl.value
+    });
+    toast('✅ Đã chia sẻ chuỗi QR');
+
+  } catch (e){
+    // User bấm Cancel trên sheet share → không cần báo lỗi
+    if (e.name === 'AbortError') return;
+    toast('Không chia sẻ được: ' + e.message);
+  }
+}
+
 /* ===================================================================
-   NHẤN GIỮ ẢNH QR → MENU
+   PHẦN 15 — BOTTOM SHEET (nhấn giữ ảnh QR)
    =================================================================== */
 function openSheet(){ $('sheet').classList.add('show'); }
 function closeSheet(){ $('sheet').classList.remove('show'); }
@@ -1115,18 +1156,34 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+/* ===================================================================
+   PHẦN 16 — KHỞI TẠO
+   =================================================================== */
+
+/* Ẩn nút Share nếu trình duyệt không hỗ trợ Web Share API */
+if (!navigator.share){
+  const btn = $('btnShare');
+  if (btn) btn.style.display = 'none';
+  const sheetBtn = $('sheetShareBtn');
+  if (sheetBtn) sheetBtn.style.display = 'none';
+  const qrActions = document.querySelector('.qr-actions');
+  if (qrActions) qrActions.style.gridTemplateColumns = '1fr 1fr';
+}
+
 /* Service Worker */
 if ('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
-/* Khởi tạo */
+/* Khởi tạo form */
 refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
-loadBanks();   // Tải danh sách ngân hàng: API → local → cache
 
-/* Cảnh báo nếu thư viện chưa load */
+/* Tải danh sách ngân hàng (API → local → cache) */
+loadBanks();
+
+/* Cảnh báo nếu thư viện chưa load sau 3 giây */
 setTimeout(() => {
   if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined'){
     toast('⚠️ Thư viện QR chưa load. Kiểm tra qrcode.min.js & html5-qrcode.min.js.', 5000);

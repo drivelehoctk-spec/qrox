@@ -1,7 +1,8 @@
 /* Service Worker — QRoX Mobile
    ⚠️ CACHE version đổi thành v3 để force clear cache cũ */
 
-const CACHE = 'qrox-v3';
+/* const CACHE = 'qrox-v3'; */
+const CACHE = 'qrox-v4';
 const CORE = [
   './',
   './index.html',

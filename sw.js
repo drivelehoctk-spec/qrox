@@ -1,6 +1,10 @@
-/* Service Worker — QRoX Mobile */
+/* ===================================================================
+   Service Worker — QRoX Mobile
+   ⚠️ Đổi CACHE version mỗi khi sửa index.html / sw.js để force reload
+   =================================================================== */
 
-const CACHE = 'qrox-v10';
+const CACHE = 'qrox-v11';   // ⚠️ ĐÃ ĐỔI từ v10 → v11 (do thêm tính năng Share)
+
 const CORE = [
   './',
   './index.html',
@@ -10,14 +14,18 @@ const CORE = [
   './banks.json'
 ];
 
+/* Install: cache toàn bộ file core */
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(CORE).catch(err => console.warn('Cache một số file lỗi:', err)))
+      .then(c => c.addAll(CORE).catch(err =>
+        console.warn('Cache một số file lỗi:', err)
+      ))
       .then(() => self.skipWaiting())
   );
 });
 
+/* Activate: xoá cache cũ không còn dùng */
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
@@ -28,18 +36,21 @@ self.addEventListener('activate', e => {
   );
 });
 
+/* Fetch: cache-first, fallback network */
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
 
-  // API VietQR: ưu tiên network, không cache
+  // API VietQR — luôn fetch mới, không cache (cần dữ liệu tươi)
   if (e.request.url.includes('api.vietqr.io')){
-    return;   // Để browser tự fetch
+    return;   // Để browser tự xử lý, không qua Service Worker
   }
 
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
+
       return fetch(e.request).then(res => {
+        // Chỉ cache response OK, cùng origin
         if (res.ok && e.request.url.startsWith(self.location.origin)){
           const clone = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, clone));

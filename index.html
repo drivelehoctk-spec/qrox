@@ -84,10 +84,11 @@ button.orange{background:#f59e0b}
 .info .val{
   flex: 1;
   font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
-  font-size: 11.5px;
-  word-break: normal;        /* Không cắt vụn ký tự tùy tiện nữa */
-  overflow-wrap: anywhere;   /* Cho phép bọc từ thông minh, ưu tiên giữ nguyên cụm từ */
-  white-space: pre-wrap;     /* Tôn trọng khoảng cách và dấu cách thực tế của chuỗi */
+  font-size: 11px;             /* Thu nhỏ nhẹ cỡ chữ để chứa được nhiều nội dung hơn trên mobile */
+  word-break: normal;          /* Không ngắt quãng ký tự thô bạo */
+  overflow-wrap: anywhere;     /* Cho phép bọc từ thông minh tại bất kỳ vị trí khoảng trắng hoặc ký tự nào nếu quá dài */
+  white-space: pre-wrap;       /* Giữ nguyên vẹn khoảng trắng và cấu trúc văn bản */
+  max-width: 100%;             /* Đảm bảo không bị tràn khung layout */
   color: #111;
 }
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;

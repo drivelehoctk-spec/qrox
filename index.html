@@ -72,7 +72,7 @@ button.orange{background:#f59e0b}
 .chk-row input[type=checkbox]{width:20px;height:20px;margin:0;flex:none;accent-color:var(--primary)}
 .chk-row span{font-size:14px;color:#222;line-height:1.4}
 
-/* --- INFO PANEL: Gọn gàng, gộp khối, chống đứt chữ --- */
+/* --- INFO PANEL: Gộp khối liền mạch, không khung textbox --- */
 .info{
   display:none;
   margin-top:10px;
@@ -85,39 +85,36 @@ button.orange{background:#f59e0b}
 .info .t{
   font-weight:700;
   color:var(--success);
-  margin-bottom:10px;
+  margin-bottom:8px;
   font-size:13.5px;
   line-height:1.3;
 }
 
-/* Layout dạng danh sách mô tả (Label + Value cùng dòng) */
+/* Từng dòng thông tin: Label và Value nằm trên 1 dòng */
 .info .row{
   display:flex;
-  align-items:flex-start;
+  flex-wrap:wrap; /* Cho phép value rớt xuống dòng dưới nếu quá dài */
+  align-items:baseline;
   margin:6px 0;
   font-size:13px;
   line-height:1.5;
 }
 .info .lbl{
-  flex:0 0 95px; /* Cố định độ rộng nhãn để thẳng hàng */
+  flex:0 0 auto;
+  font-weight:600;
   color:#4b5563;
-  font-weight:500;
-  padding-top:1px;
-}
-.info .val{
-  flex:1;
-  min-width:0; /* Quan trọng để flex item có thể co lại và wrap */
-  color:#111;
-  font-family: Arial, Helvetica, sans-serif;
-  word-break: break-word; /* Chỉ ngắt khi từ quá dài, không chẻ đôi từ */
-  overflow-wrap: anywhere;
+  margin-right:6px;
 }
 
-/* Mobile màn hình quá nhỏ thì đẩy value xuống dòng */
-@media (max-width: 360px){
-  .info .row{flex-direction:column; gap:2px;}
-  .info .lbl{flex:none; font-size:12px; color:#6b7280;}
-  .info .val{width:100%;}
+/* Value không có viền, không nền, chống ngắt chữ giữa từ */
+.info .val{
+  flex:1 1 auto;
+  min-width:0; /* Bắt buộc để flexbox không tràn */
+  color:#111;
+  font-family: Arial, Helvetica, sans-serif;
+  word-break:normal; /* Chỉ ngắt tại khoảng trắng */
+  overflow-wrap:break-word; /* Chỉ ngắt khi từ quá dài */
+  white-space:normal;
 }
 
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;
@@ -315,13 +312,11 @@ button.orange{background:#f59e0b}
   <!-- Vùng hiển thị thông tin đã quét -->
   <div class="info" id="infoPanel">
     <div class="t">✅ QR đã đọc thành công</div>
-    <div class="row"><div class="lbl">Số TK:</div><div class="val" id="iAcc">—</div></div>
-    <div class="row"><div class="lbl">Chủ tài khoản:</div><div class="val" id="iHolder">—</div></div>
-    <div class="row"><div class="lbl">Số tiền:</div><div class="val" id="iAmt">—</div></div>
-    <div class="row"><div class="lbl">Nội dung:</div><div class="val" id="iContent">—</div></div>
-    <div class="row"><div class="lbl">Chế độ:</div>
-      <div class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></div>
-    </div>
+    <div class="row"><span class="lbl">Số TK:</span><span class="val" id="iAcc">—</span></div>
+    <div class="row"><span class="lbl">Chủ TK:</span><span class="val" id="iHolder">—</span></div>
+    <div class="row"><span class="lbl">Số tiền:</span><span class="val" id="iAmt">—</span></div>
+    <div class="row"><span class="lbl">Nội dung:</span><span class="val" id="iContent">—</span></div>
+    <div class="row"><span class="lbl">Chế độ:</span><span class="val"><span id="iMode" class="badge b-dynamic">ĐỘNG</span></span></div>
   </div>
 
   <label class="chk-row" style="margin-top:8px;border-top:1px solid var(--border);padding-top:14px">
@@ -711,8 +706,11 @@ function handleDecoded(text){
     const bankInfo = getBankByBin(info.bankCode);
     const bankShortName = bankInfo ? bankInfo.shortName : '';
 
-    // Làm sạch nội dung: Gộp các khoảng trắng thừa thành 1 dấu cách
-    const cleanContent = (info.content || '').replace(/\s+/g, ' ').trim();
+    // Làm sạch nội dung: Xóa ký tự vô hình (Zero-width space), gộp khoảng trắng
+    const cleanContent = (info.content || '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '') 
+      .replace(/\s+/g, ' ') 
+      .trim();
 
     $('iAcc').textContent     = info.account + (bankShortName ? ' - ' + bankShortName : '');
     $('iHolder').textContent  = info.accHolder || '(không có)';

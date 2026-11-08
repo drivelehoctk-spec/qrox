@@ -79,18 +79,10 @@ button.orange{background:#f59e0b}
 .info.show{display:block}
 .info .t{font-weight:700;color:var(--success);margin-bottom:8px;
   display:flex;align-items:center;gap:6px;font-size:13.5px}
-.info .row{display:flex;margin:5px 0;font-size:12.5px;align-items:flex-start}
-.info .lbl{flex:0 0 110px;color:#4b5563;font-weight:500}
-.info .val{
-  flex: 1;
-  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
-  font-size: 11px;             /* Thu nhỏ nhẹ cỡ chữ để chứa được nhiều nội dung hơn trên mobile */
-  word-break: normal;          /* Không ngắt quãng ký tự thô bạo */
-  overflow-wrap: anywhere;     /* Cho phép bọc từ thông minh tại bất kỳ vị trí khoảng trắng hoặc ký tự nào nếu quá dài */
-  white-space: pre-wrap;       /* Giữ nguyên vẹn khoảng trắng và cấu trúc văn bản */
-  max-width: 100%;             /* Đảm bảo không bị tràn khung layout */
-  color: #111;
-}
+.info .row{display:flex;margin:5px 0;font-size:12.5px;align-items:flex-start;width:100%}
+.info .lbl{flex:0 0 95px;color:#4b5563;font-weight:500}
+.info .val{flex:1;min-width:0;font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+  font-size:11px;word-break:normal;overflow-wrap:break-word;white-space:pre-wrap;color:#111}
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;
   font-weight:700;letter-spacing:.3px}
 .b-static{background:#fee2e2;color:#b91c1c}
@@ -195,7 +187,7 @@ button.orange{background:#f59e0b}
 
 <div id="toast"></div>
 
-<!-- Camera Overlay (Giao diện) -->
+<!-- Camera Overlay -->
 <div id="cam">
   <div class="cam-top">
     <span class="ttl">📷 Quét QR</span>
@@ -205,7 +197,7 @@ button.orange{background:#f59e0b}
   <div class="cam-tip">Căn QR vào giữa khung, giữ khoảng 15–20 cm</div>
 </div>
 
-<!-- Bottom Sheet (Giao diện) -->
+<!-- Bottom Sheet -->
 <div id="sheet" onclick="if(event.target===this)closeSheet()">
   <div class="sheet-body">
     <div class="grab"></div>
@@ -895,7 +887,7 @@ refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
 
-// Gọi hàm loadBanks() từ app.js để nạp dữ liệu ngân hàng
+// Nạp danh sách ngân hàng từ app.js
 loadBanks();
 
 setTimeout(() => {

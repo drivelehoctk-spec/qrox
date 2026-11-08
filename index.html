@@ -10,9 +10,13 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMDA3OGQ3Ii8+PHRleHQgeD0iOTYiIHk9IjEyNCIgZm9udC1zaXplPSI5NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSJib2xkIj5RUjwvdGV4dD48L3N2Zz4=">
 
+<!-- Thư viện ngoài -->
 <script src="qrcode.min.js"></script>
 <script src="html5-qrcode.min.js"></script>
 <script src="jsQR.min.js"></script>
+
+<!-- Thuật toán tách rời -->
+<script src="app.js"></script>
 
 <style>
 :root{
@@ -84,7 +88,7 @@ button.orange{background:#f59e0b}
 .b-static{background:#fee2e2;color:#b91c1c}
 .b-dynamic{background:#dbeafe;color:#1d4ed8}
 
-/* Autocomplete */
+/* Autocomplete giao diện */
 .autocomplete-wrap{position:relative}
 .autocomplete-list{display:none;position:absolute;top:100%;left:0;right:0;
   background:#fff;border:1px solid var(--border);border-radius:10px;
@@ -104,7 +108,6 @@ button.orange{background:#f59e0b}
 .autocomplete-item .full{color:var(--muted);font-size:11px;line-height:1.3}
 .autocomplete-empty{padding:16px;text-align:center;color:var(--muted);font-size:12.5px}
 
-/* Logo ngân hàng trong hint (dưới ô BIN) */
 .bank-hint-row{display:inline-flex;align-items:center;gap:8px;vertical-align:middle}
 .bank-logo-hint{width:24px;height:24px;object-fit:contain;flex:none;
   border-radius:4px;background:#fff}
@@ -184,6 +187,7 @@ button.orange{background:#f59e0b}
 
 <div id="toast"></div>
 
+<!-- Camera Overlay (Giao diện) -->
 <div id="cam">
   <div class="cam-top">
     <span class="ttl">📷 Quét QR</span>
@@ -193,6 +197,7 @@ button.orange{background:#f59e0b}
   <div class="cam-tip">Căn QR vào giữa khung, giữ khoảng 15–20 cm</div>
 </div>
 
+<!-- Bottom Sheet (Giao diện) -->
 <div id="sheet" onclick="if(event.target===this)closeSheet()">
   <div class="sheet-body">
     <div class="grab"></div>
@@ -325,211 +330,9 @@ button.orange{background:#f59e0b}
 
 <script>
 /* ===================================================================
-   PHẦN 1 — VIETQR CORE
+   GIAO DIỆN & TƯƠNG TÁC UI (Liên kết với các hàm thuật toán ở app.js)
    =================================================================== */
 
-function crc16(s){
-  let crc = 0xFFFF, poly = 0x1021;
-  for (const ch of s){
-    const b = ch.charCodeAt(0);
-    for (let i = 0; i < 8; i++){
-      const bit = ((b >> (7 - i)) & 1) === 1;
-      const c15 = ((crc >> 15) & 1) === 1;
-      crc = (crc << 1) & 0xFFFF;
-      if (c15 !== bit) crc ^= poly;
-    }
-  }
-  return crc.toString(16).toUpperCase().padStart(4, '0');
-}
-
-function tlv(tag, val){
-  return tag + String(val.length).padStart(2, '0') + val;
-}
-
-function strip(s){
-  return (s || '')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
-    .replace(/[^\x20-\x7E]/g, '');
-}
-
-function parseTLV(text){
-  const r = {}; let i = 0;
-  while (i <= text.length - 4){
-    const tag = text.substr(i, 2);
-    const len = parseInt(text.substr(i + 2, 2), 10);
-    if (isNaN(len) || i + 4 + len > text.length) break;
-    r[tag] = text.substr(i + 4, len);
-    i += 4 + len;
-  }
-  return r;
-}
-
-function buildVietQR({bin, acc, holder = '', amount = '', content = '',
-                      method = 'dynamic', includeHolder = false}){
-  const isStatic = (method === 'static');
-
-  const inner = tlv('00', bin) + tlv('01', acc);
-  const merchant = tlv('38',
-    tlv('00', 'A000000727') + tlv('01', inner) + tlv('02', 'QRIBFTTA')
-  );
-
-  const amtTLV = (amount && +amount > 0) ? tlv('54', String(+amount)) : '';
-  const add = content ? tlv('08', strip(content)) : '';
-  const addTLV = add ? tlv('62', add) : '6200';
-  const mName = (includeHolder && holder) ? tlv('59', strip(holder)) : '';
-
-  const init = isStatic ? tlv('01', '12') : tlv('01', '11');
-
-  const payload = tlv('00', '01') + init + merchant + tlv('53', '704')
-                + amtTLV + tlv('58', 'VN') + addTLV + mName;
-  const withCrc = payload + '6304';
-  return withCrc + crc16(withCrc);
-}
-
-function parseVietQR(text){
-  if (!text || !text.startsWith('000201') || !text.includes('A000000727')) return null;
-  const root = parseTLV(text);
-  const out = {
-    bankCode: '', account: '', accHolder: '',
-    amount: '', content: '', isStatic: false
-  };
-
-  const maRaw = root['38'] || root['26'];
-  if (maRaw){
-    const ma = parseTLV(maRaw);
-    if (ma['01']){
-      const inner = parseTLV(ma['01']);
-      out.bankCode = inner['00'] || '';
-      out.account  = inner['01'] || '';
-    }
-  }
-  if (root['54']) out.amount    = root['54'];
-  if (root['59']) out.accHolder = root['59'];
-  if (root['62']){
-    const s = parseTLV(root['62']);
-    out.content = s['08'] || s['01'] || '';
-  }
-  if (root['01']) out.isStatic = (root['01'] === '12');
-  else            out.isStatic = false;
-
-  return out;
-}
-
-/* ===================================================================
-   PHẦN 2 — DANH SÁCH NGÂN HÀNG (API → local → cache)
-   =================================================================== */
-let BANKS = [];
-
-function normalize(s){
-  return (s || '').toString().toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g,'d').replace(/Đ/g,'d')
-    .replace(/\s+/g,' ').trim();
-}
-
-function mapBankRecord(b){
-  return {
-    bin:       String(b.bin || ''),
-    code:      String(b.code || ''),
-    shortName: String(b.shortName || b.short_name || ''),
-    fullName:  String(b.name || ''),
-    swiftCode: String(b.swift_code || b.swiftCode || ''),
-    logo:      String(b.logo || '')
-  };
-}
-
-async function fetchBanksFromApi(){
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 5000);
-  try {
-    const resp = await fetch('https://api.vietqr.io/v2/banks', { signal: ctrl.signal });
-    clearTimeout(timer);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const json = await resp.json();
-    if (json.code !== '00' || !Array.isArray(json.data) || !json.data.length){
-      throw new Error('Dữ liệu API không hợp lệ');
-    }
-    return json.data.map(mapBankRecord).filter(b => b.bin);
-  } catch (e){
-    clearTimeout(timer);
-    throw e;
-  }
-}
-
-async function fetchBanksFromLocalFile(){
-  const resp = await fetch('./banks.json', { cache: 'no-cache' });
-  if (!resp.ok) throw new Error('HTTP ' + resp.status);
-  const json = await resp.json();
-  if (json.code !== '00' || !Array.isArray(json.data) || !json.data.length){
-    throw new Error('banks.json không hợp lệ');
-  }
-  return json.data.map(mapBankRecord).filter(b => b.bin);
-}
-
-function saveBanksCache(banks){
-  try {
-    localStorage.setItem('qrox_banks_v4',
-      JSON.stringify({ data: banks, ts: Date.now() }));
-  } catch {}
-}
-
-function loadBanksCache(){
-  try {
-    const cached = localStorage.getItem('qrox_banks_v4');
-    if (!cached) return null;
-    const obj = JSON.parse(cached);
-    if (Array.isArray(obj.data) && obj.data.length &&
-        (Date.now() - obj.ts) < 30*24*60*60*1000){
-      return obj.data;
-    }
-  } catch {}
-  return null;
-}
-
-async function loadBanks(){
-  try {
-    const banks = await fetchBanksFromApi();
-    if (banks && banks.length){
-      BANKS = banks;
-      saveBanksCache(BANKS);
-      console.log(`🌐 Loaded ${BANKS.length} banks from API`);
-      return;
-    }
-  } catch (e){
-    console.warn('⚠️ API lỗi:', e.message);
-  }
-
-  try {
-    const banks = await fetchBanksFromLocalFile();
-    if (banks && banks.length){
-      BANKS = banks;
-      saveBanksCache(BANKS);
-      console.log(`📄 API lỗi → loaded ${BANKS.length} banks from banks.json`);
-      return;
-    }
-  } catch (e){
-    console.warn('⚠️ banks.json lỗi:', e.message);
-  }
-
-  const cached = loadBanksCache();
-  if (cached){
-    BANKS = cached;
-    console.log(`📦 API + local đều lỗi → dùng cache (${BANKS.length} banks)`);
-    return;
-  }
-
-  BANKS = [];
-  console.warn('⚠️ Không tải được danh sách ngân hàng. Nhập BIN thủ công.');
-}
-
-function getBankByBin(bin){
-  return BANKS.find(b => b.bin === bin) || null;
-}
-
-/* ===================================================================
-   PHẦN 3 — STATE
-   =================================================================== */
 let lastScannedInfo = null;
 let currentQRBlob   = null;
 let scanner         = null;
@@ -550,9 +353,7 @@ const qrOutEl     = $('qrOut');
 const noQREl      = $('noQR');
 const qrStrEl     = $('qrString');
 
-/* ===================================================================
-   PHẦN 4 — TOAST
-   =================================================================== */
+/* --- TOAST GIAO DIỆN --- */
 let toastTimer;
 function toast(msg, duration = 2200){
   const el = $('toast');
@@ -562,9 +363,7 @@ function toast(msg, duration = 2200){
   toastTimer = setTimeout(() => el.classList.remove('show'), duration);
 }
 
-/* ===================================================================
-   PHẦN 5 — STATE MACHINE
-   =================================================================== */
+/* --- STATE MACHINE GIAO DIỆN --- */
 function refreshState(){
   const bank  = bankEl.value.trim();
   const acc   = accEl.value.trim();
@@ -587,9 +386,7 @@ function refreshState(){
 
 FORM_IDS.forEach(id => $(id).addEventListener('input', refreshState));
 
-/* ===================================================================
-   PHẦN 6 — AUTOCOMPLETE NGÂN HÀNG (có logo)
-   =================================================================== */
+/* --- AUTOCOMPLETE NGÂN HÀNG --- */
 const bankSuggestEl = $('bankSuggest');
 const bankHintEl    = $('bankNameHint');
 
@@ -610,8 +407,7 @@ function updateBankHint(){
   }
 
   const nv = normalize(v);
-  const found = BANKS.find(b =>
-    b.bin === v ||
+  const found = getBankByBin(v) || BANKS.find(b =>
     normalize(b.code)      === nv ||
     normalize(b.shortName) === nv ||
     normalize(b.fullName)  === nv ||
@@ -620,8 +416,7 @@ function updateBankHint(){
 
   if (found){
     const logoHtml = found.logo
-      ? `<img src="${found.logo}" alt="" class="bank-logo-hint"
-              onerror="this.style.display='none'">`
+      ? `<img src="${found.logo}" alt="" class="bank-logo-hint" onerror="this.style.display='none'">`
       : `<span class="bank-logo-hint bank-logo-fallback">🏦</span>`;
 
     bankHintEl.innerHTML =
@@ -672,8 +467,7 @@ function renderBankSuggest(query){
 
   bankSuggestEl.innerHTML = matches.map(b => {
     const logoHtml = b.logo
-      ? `<img src="${b.logo}" alt="" class="bank-logo-hint"
-              onerror="this.style.display='none'">`
+      ? `<img src="${b.logo}" alt="" class="bank-logo-hint" onerror="this.style.display='none'">`
       : `<span class="bank-logo-hint bank-logo-fallback">🏦</span>`;
 
     return `
@@ -736,9 +530,7 @@ bankEl.addEventListener('blur', () => {
   }
 });
 
-/* ===================================================================
-   PHẦN 7 — CHECKBOX TĨNH/ĐỘNG + ĐẾM KÝ TỰ + FORMAT TIỀN
-   =================================================================== */
+/* --- XỬ LÝ FORM & GIAO DIỆN KHÁC --- */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
   if (chkStaticEl.checked){
@@ -778,9 +570,7 @@ amtEl.addEventListener('input', () => {
   refreshState();
 });
 
-/* ===================================================================
-   PHẦN 8 — CAMERA
-   =================================================================== */
+/* --- CAMERA GIAO DIỆN --- */
 function openCamera(){
   $('cam').classList.add('show');
   if (scanner){ scanner = null; }
@@ -808,21 +598,19 @@ function closeCamera(){
   }
 }
 
-/* ===================================================================
-   PHẦN 9 — CHỌN ẢNH / PASTE ẢNH
-   =================================================================== */
+/* --- TẢI ẢNH & PASTE ẢNH (Dùng hàm decodeImageFile từ app.js) --- */
 function pickImage(){ $('filePick').click(); }
 
 $('filePick').addEventListener('change', function(){
   const file = this.files[0];
   this.value = '';
   if (!file) return;
-
-  const url = URL.createObjectURL(file);
-  const img = new Image();
-  img.onload = () => { decodeImage(img); URL.revokeObjectURL(url); };
-  img.onerror = () => { toast('Không đọc được ảnh'); URL.revokeObjectURL(url); };
-  img.src = url;
+  
+  decodeImageFile(file, (text) => {
+    handleDecoded(text);
+  }, (errMsg) => {
+    toast('❌ ' + errMsg, 3500);
+  });
 });
 
 async function pasteImage(){
@@ -837,10 +625,12 @@ async function pasteImage(){
       const imgType = it.types.find(t => t.startsWith('image/'));
       if (!imgType) continue;
       const blob = await it.getType(imgType);
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => { decodeImage(img); URL.revokeObjectURL(url); };
-      img.src = url;
+      
+      decodeImageFile(blob, (text) => {
+        handleDecoded(text);
+      }, (errMsg) => {
+        toast('❌ ' + errMsg, 3500);
+      });
       found = true;
       break;
     }
@@ -850,65 +640,7 @@ async function pasteImage(){
   }
 }
 
-/* ===================================================================
-   PHẦN 10 — DECODE ẢNH TĨNH
-   =================================================================== */
-async function decodeImage(img){
-  bankEl.value = '';
-  accEl.value = '';
-  holderEl.value = '';
-  amtEl.value = '';
-  msgEl.value = '';
-  qrStrEl.value = '';
-  qrOutEl.classList.remove('show');
-  noQREl.style.display = '';
-  $('infoPanel').classList.remove('show');
-  lastScannedInfo = null;
-  currentQRBlob = null;
-  updateBankHint();
-  refreshState();
-
-  toast('⏳ Đang đọc QR từ ảnh...', 1500);
-
-  let box = document.getElementById('fileScannerBox');
-  if (!box){
-    box = document.createElement('div');
-    box.id = 'fileScannerBox';
-    box.style.cssText = 'position:fixed;bottom:0;right:0;width:200px;height:200px;' +
-                        'opacity:0.01;pointer-events:none;overflow:hidden;z-index:-1';
-    document.body.appendChild(box);
-  }
-  box.innerHTML = '';
-
-  const tmp = new Html5Qrcode('fileScannerBox', {
-    formatsToSupport: [
-      Html5QrcodeSupportedFormats.QR_CODE,
-      Html5QrcodeSupportedFormats.EAN_13,
-      Html5QrcodeSupportedFormats.EAN_8,
-      Html5QrcodeSupportedFormats.CODE_128,
-      Html5QrcodeSupportedFormats.CODE_39,
-      Html5QrcodeSupportedFormats.UPC_A,
-      Html5QrcodeSupportedFormats.UPC_E,
-      Html5QrcodeSupportedFormats.ITF
-    ],
-    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-    verbose: false
-  });
-
-  try {
-    const text = await tmp.scanFile(img, false);
-    await tmp.clear();
-    handleDecoded(text);
-  } catch (err){
-    try { await tmp.clear(); } catch {}
-    console.warn('Decode ảnh thất bại:', err);
-    toast('❌ Không tìm thấy QR trong ảnh này. Thử ảnh rõ hơn hoặc cắt sát QR.', 3500);
-  }
-}
-
-/* ===================================================================
-   PHẦN 11 — XỬ LÝ SAU KHI DECODE
-   =================================================================== */
+/* --- XỬ LÝ KẾT QUẢ ĐỌC QR --- */
 function handleDecoded(text){
   if (!text) return;
   text = text.trim().replace(/[\r\n]+/g, '').replace(/\u200B/g, '');
@@ -951,7 +683,7 @@ function handleDecoded(text){
     msgEl.dispatchEvent(new Event('input'));
     updateBankHint();
 
-    toast('✅ Đã đọc QR — bạn có thể sửa rồi tạo mới');
+    toast('✅ Đã đọc QR thành công');
   } else {
     lastScannedInfo = null;
     $('infoPanel').classList.remove('show');
@@ -967,9 +699,7 @@ function handleDecoded(text){
   refreshState();
 }
 
-/* ===================================================================
-   PHẦN 12 — TẠO QR (qrcodejs API)
-   =================================================================== */
+/* --- TẠO MÃ QR (Giao diện) --- */
 function genQR(){
   try {
     const amountRaw = amtEl.value.replace(/\D/g, '');
@@ -1038,15 +768,9 @@ function genQR(){
   }
 }
 
-/* ===================================================================
-   PHẦN 13 — AUTO-COPY
-   =================================================================== */
 async function autoCopyQR(){
   try {
-    if (!navigator.clipboard){
-      toast('Đã tạo QR (không sao chép được)');
-      return;
-    }
+    if (!navigator.clipboard) return;
     if (currentQRBlob && window.ClipboardItem){
       const item = new ClipboardItem({ 'image/png': currentQRBlob });
       await navigator.clipboard.write([item]);
@@ -1059,15 +783,10 @@ async function autoCopyQR(){
     try {
       await navigator.clipboard.writeText(qrStrEl.value);
       toast('Đã tạo QR (đã copy chuỗi)');
-    } catch {
-      toast('Đã tạo QR');
-    }
+    } catch {}
   }
 }
 
-/* ===================================================================
-   PHẦN 14 — COPY / DOWNLOAD / SHARE
-   =================================================================== */
 async function copyQR(){
   if (!currentQRBlob){ toast('Chưa có QR để sao chép'); return; }
   try {
@@ -1099,18 +818,14 @@ function downloadQR(){
 
 async function shareQR(){
   if (!currentQRBlob){ toast('Chưa có QR để chia sẻ'); return; }
-
   if (!navigator.share){
-    toast('Trình duyệt không hỗ trợ chia sẻ. Dùng "Tải về" hoặc "Sao chép" thay thế.', 3000);
+    toast('Trình duyệt không hỗ trợ chia sẻ.', 3000);
     return;
   }
-
   const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
   const filename = `VietQR_${ts}.png`;
-
   try {
     const file = new File([currentQRBlob], filename, { type: 'image/png' });
-
     if (navigator.canShare && navigator.canShare({ files: [file] })){
       await navigator.share({
         files: [file],
@@ -1120,22 +835,15 @@ async function shareQR(){
       toast('✅ Đã chia sẻ ảnh QR');
       return;
     }
-
-    await navigator.share({
-      title: 'Mã QR thanh toán',
-      text: qrStrEl.value
-    });
+    await navigator.share({ title: 'Mã QR thanh toán', text: qrStrEl.value });
     toast('✅ Đã chia sẻ chuỗi QR');
-
   } catch (e){
     if (e.name === 'AbortError') return;
     toast('Không chia sẻ được: ' + e.message);
   }
 }
 
-/* ===================================================================
-   PHẦN 15 — BOTTOM SHEET (nhấn giữ ảnh QR)
-   =================================================================== */
+/* --- BOTTOM SHEET --- */
 function openSheet(){ $('sheet').classList.add('show'); }
 function closeSheet(){ $('sheet').classList.remove('show'); }
 
@@ -1161,9 +869,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* ===================================================================
-   PHẦN 16 — KHỞI TẠO
-   =================================================================== */
+/* --- KHỞI TẠO --- */
 if (!navigator.share){
   const btn = $('btnShare');
   if (btn) btn.style.display = 'none';
@@ -1180,11 +886,13 @@ if ('serviceWorker' in navigator){
 refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
+
+// Gọi hàm loadBanks() từ app.js để nạp dữ liệu ngân hàng
 loadBanks();
 
 setTimeout(() => {
-  if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined'){
-    toast('⚠️ Thư viện QR chưa load. Kiểm tra qrcode.min.js & html5-qrcode.min.js.', 5000);
+  if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined' || typeof jsQR === 'undefined'){
+    toast('⚠️ Thư viện QR chưa load đủ.', 5000);
   }
 }, 3000);
 </script>

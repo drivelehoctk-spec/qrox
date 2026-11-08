@@ -1,16 +1,17 @@
 /* ===================================================================
    Service Worker — QRoX Mobile
-   ⚠️ Đổi CACHE version mỗi khi sửa index.html / sw.js để force reload
    =================================================================== */
 
-const CACHE = 'qrox-v16';
+const CACHE = 'qrox-v17'; // Tăng phiên bản cache lên v17 để force update
 
 const CORE = [
   './',
   './index.html',
+  './app.js',          // Thêm file app.js vào cache
   './manifest.json',
   './qrcode.min.js',
   './html5-qrcode.min.js',
+  './jsQR.min.js',     // Thêm file jsQR vào cache
   './banks.json'
 ];
 
@@ -36,15 +37,11 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-
-  if (e.request.url.includes('api.vietqr.io')){
-    return;
-  }
+  if (e.request.url.includes('api.vietqr.io')) return;
 
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
-
       return fetch(e.request).then(res => {
         if (res.ok && e.request.url.startsWith(self.location.origin)){
           const clone = res.clone();

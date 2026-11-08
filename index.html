@@ -15,7 +15,7 @@
 <script src="html5-qrcode.min.js"></script>
 <script src="jsQR.min.js"></script>
 
-<!-- Thuật toán tách rời -->
+<!-- Thuật toán lõi -->
 <script src="app.js"></script>
 
 <style>
@@ -65,53 +65,61 @@ button.orange{background:#f59e0b}
 .src-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
 .src-btn{flex-direction:column;padding:14px 6px;font-size:12px;line-height:1.4;
   background:#f8f9fb;color:#222;border:1px solid var(--border);font-weight:500}
-.src-btn .ic{font-size:20px;margin-bottom:4px;font-weight:700;color:var(--primary)}
+.src-btn .ic{font-size:14px;margin-bottom:4px;font-weight:700;color:var(--primary);letter-spacing:0.5px}
 
 .chk-row{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer;
   user-select:none;-webkit-user-select:none}
 .chk-row input[type=checkbox]{width:20px;height:20px;margin:0;flex:none;accent-color:var(--primary)}
 .chk-row span{font-size:14px;color:#222;line-height:1.4}
 
-/* --- INFO PANEL (đã sửa lỗi ngắt dòng đứt chữ) --- */
-.info{display:none;margin-top:10px;padding:12px 14px;
+/* --- INFO PANEL: Đã fix triệt để lỗi đứt chữ trên Edge Mobile --- */
+.info{
+  display:none;
+  margin-top:10px;
+  padding:12px 14px;
   background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);
-  border-radius:12px;border-left:4px solid var(--success)}
+  border-radius:12px;
+  border-left:4px solid var(--success);
+}
 .info.show{display:block}
-.info .t{font-weight:700;color:var(--success);margin-bottom:8px;
-  font-size:13.5px}
+.info .t{
+  font-weight:700;
+  color:var(--success);
+  margin-bottom:10px;
+  font-size:13.5px;
+  line-height:1.3;
+}
 .info .row{
-  display:flex;
-  flex-wrap:wrap;
-  margin:6px 0;
-  font-size:12.5px;
-  align-items:flex-start;
-  width:100%;
-  gap:2px 8px;
+  display:block; /* Bỏ flexbox để tránh bóp méo */
+  margin:8px 0;
 }
 .info .lbl{
-  flex:0 0 auto;
-  min-width:85px;
-  color:#4b5563;
+  display:block;
+  font-size:11px;
+  color:#6b7280;
   font-weight:500;
+  margin-bottom:3px;
 }
 .info .val{
-  flex:1 1 auto;
-  min-width:0;
-  font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
-  font-size:11px;
-  word-break:normal;
-  overflow-wrap:anywhere;
-  hyphens:none;
-  white-space:pre-wrap;
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  font-family: Arial, Helvetica, sans-serif; /* Font an toàn cho tiếng Việt */
+  font-size:13px;
+  line-height:1.6; /* Khoảng cách dòng rộng chống đè dấu */
+  letter-spacing:0.3px;
   color:#111;
-  line-height:1.5;
-  padding-top:1px;
+  background:rgba(255,255,255,.8);
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid rgba(22,163,74,.2);
+  white-space: pre-wrap;       /* Tự động xuống dòng */
+  word-break: break-word;      /* Chỉ ngắt khi từ quá dài */
+  overflow-wrap: anywhere;     /* Chống tràn màn hình */
+  -webkit-hyphens: none;
+  hyphens: none;
 }
-@media (max-width: 420px){
-  .info .row{flex-direction:column;gap:1px;}
-  .info .lbl{flex:none;min-width:0;font-size:11.5px;color:#6b7280;}
-  .info .val{flex:none;width:100%;font-size:11px;}
-}
+.info .val .badge{display:inline-block;margin-top:0}
 
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;
   font-weight:700;letter-spacing:.3px}
@@ -156,10 +164,19 @@ button.orange{background:#f59e0b}
 
 .qr-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px}
 .qr-actions button{padding:10px 6px;font-size:12px;gap:4px;flex-direction:column;min-height:56px}
-.qr-actions button .ic{font-size:16px;line-height:1;font-weight:700}
+.qr-actions button .ic{font-size:14px;line-height:1;font-weight:700;letter-spacing:0.5px}
 
-.qr-str{margin-top:10px;font-family:ui-monospace,Consolas,monospace;font-size:11px;
-  min-height:56px;background:#f8f9fb}
+/* Textarea chuỗi QR */
+.qr-str{margin-top:10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size:12px;
+  line-height:1.5;
+  min-height:56px;
+  background:#f8f9fb;
+  white-space: pre-wrap; 
+  word-break: break-all; 
+  overflow-x: hidden;
+}
 .empty{text-align:center;padding:26px 12px;color:#9ca3af;font-size:13px;line-height:1.6}
 
 /* Camera overlay */
@@ -296,6 +313,7 @@ button.orange{background:#f59e0b}
     <div class="counter" id="charCount">0 / 99</div>
   </div>
 
+  <!-- Vùng hiển thị thông tin đã quét -->
   <div class="info" id="infoPanel">
     <div class="t">QR đã đọc thành công</div>
     <div class="row"><div class="lbl">Số TK:</div><div class="val" id="iAcc">—</div></div>
@@ -355,7 +373,7 @@ button.orange{background:#f59e0b}
 
 <script>
 /* ===================================================================
-   GIAO DIỆN & TƯƠNG TÁC UI (Liên kết với các hàm thuật toán ở app.js)
+   GIAO DIỆN & TƯƠNG TÁC UI
    =================================================================== */
 
 let lastScannedInfo = null;
@@ -668,6 +686,7 @@ async function pasteImage(){
 /* --- XỬ LÝ KẾT QUẢ ĐỌC QR --- */
 function handleDecoded(text){
   if (!text) return;
+  // Lọc bỏ các ký tự xuống dòng, ký tự vô hình có thể gây lỗi hiển thị
   text = text.trim().replace(/[\r\n]+/g, '');
   text = text.replace(/[\u200B-\u200F\uFEFF]/g, '');
 
@@ -694,12 +713,15 @@ function handleDecoded(text){
     const bankInfo = getBankByBin(info.bankCode);
     const bankShortName = bankInfo ? bankInfo.shortName : '';
 
+    // Chuẩn hoá nội dung: gộp các khoảng trắng thừa thành 1 dấu cách
+    const cleanContent = (info.content || '').replace(/\s+/g, ' ').trim();
+
     $('iAcc').textContent     = info.account + (bankShortName ? ' - ' + bankShortName : '');
     $('iHolder').textContent  = info.accHolder || '(không có)';
     $('iAmt').textContent     = info.amount
       ? Number(info.amount).toLocaleString('vi-VN') + ' ₫'
       : '(không có)';
-    $('iContent').textContent = info.content || '(không có)';
+    $('iContent').textContent = cleanContent || '(không có)';
 
     const badge = $('iMode');
     badge.textContent = info.isStatic ? 'TĨNH' : 'ĐỘNG';
@@ -913,6 +935,7 @@ refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
 
+// Load banks
 loadBanks();
 
 setTimeout(() => {
@@ -923,4 +946,3 @@ setTimeout(() => {
 </script>
 </body>
 </html>
-

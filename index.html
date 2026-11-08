@@ -72,7 +72,7 @@ button.orange{background:#f59e0b}
 .chk-row input[type=checkbox]{width:20px;height:20px;margin:0;flex:none;accent-color:var(--primary)}
 .chk-row span{font-size:14px;color:#222;line-height:1.4}
 
-/* --- INFO PANEL: Đã fix triệt để lỗi đứt chữ trên Edge Mobile --- */
+/* --- INFO PANEL: Gọn gàng, gộp khối, chống đứt chữ --- */
 .info{
   display:none;
   margin-top:10px;
@@ -89,37 +89,36 @@ button.orange{background:#f59e0b}
   font-size:13.5px;
   line-height:1.3;
 }
+
+/* Layout dạng danh sách mô tả (Label + Value cùng dòng) */
 .info .row{
-  display:block;
-  margin:8px 0;
+  display:flex;
+  align-items:flex-start;
+  margin:6px 0;
+  font-size:13px;
+  line-height:1.5;
 }
 .info .lbl{
-  display:block;
-  font-size:11px;
-  color:#6b7280;
+  flex:0 0 95px; /* Cố định độ rộng nhãn để thẳng hàng */
+  color:#4b5563;
   font-weight:500;
-  margin-bottom:3px;
+  padding-top:1px;
 }
 .info .val{
-  display:block;
-  width:100%;
-  box-sizing:border-box;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size:13px;
-  line-height:1.6;
-  letter-spacing:0.3px;
+  flex:1;
+  min-width:0; /* Quan trọng để flex item có thể co lại và wrap */
   color:#111;
-  background:rgba(255,255,255,.8);
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid rgba(22,163,74,.2);
-  white-space: pre-wrap;
-  word-break: break-word;
+  font-family: Arial, Helvetica, sans-serif;
+  word-break: break-word; /* Chỉ ngắt khi từ quá dài, không chẻ đôi từ */
   overflow-wrap: anywhere;
-  -webkit-hyphens: none;
-  hyphens: none;
 }
-.info .val .badge{display:inline-block;margin-top:0}
+
+/* Mobile màn hình quá nhỏ thì đẩy value xuống dòng */
+@media (max-width: 360px){
+  .info .row{flex-direction:column; gap:2px;}
+  .info .lbl{flex:none; font-size:12px; color:#6b7280;}
+  .info .val{width:100%;}
+}
 
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;
   font-weight:700;letter-spacing:.3px}
@@ -712,6 +711,7 @@ function handleDecoded(text){
     const bankInfo = getBankByBin(info.bankCode);
     const bankShortName = bankInfo ? bankInfo.shortName : '';
 
+    // Làm sạch nội dung: Gộp các khoảng trắng thừa thành 1 dấu cách
     const cleanContent = (info.content || '').replace(/\s+/g, ' ').trim();
 
     $('iAcc').textContent     = info.account + (bankShortName ? ' - ' + bankShortName : '');

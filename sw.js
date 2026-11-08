@@ -1,6 +1,6 @@
 /* Service Worker — QRoX Mobile */
 
-const CACHE = 'qrox-vabad9c821e40'; // Tăng phiên bản cache lên để force update
+const CACHE = 'qrox-v3620b604ea99'; // Tăng phiên bản cache lên để force update
 
 const CORE = [
   './',

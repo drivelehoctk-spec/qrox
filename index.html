@@ -36,8 +36,7 @@ body{padding:12px 12px calc(90px + var(--safe-bottom));min-height:100vh}
 
 .card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;
   box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}
-.card h2{margin:0 0 12px;font-size:15px;font-weight:600;color:var(--primary);
-  display:flex;align-items:center;gap:6px}
+.card h2{margin:0 0 12px;font-size:15px;font-weight:600;color:var(--primary)}
 .card .sub{margin:-6px 0 10px;font-size:12px;color:var(--muted)}
 
 label.f{display:block;font-size:12.5px;color:var(--muted);margin:0 0 4px;font-weight:500}
@@ -66,29 +65,60 @@ button.orange{background:#f59e0b}
 .src-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:6px}
 .src-btn{flex-direction:column;padding:14px 6px;font-size:12px;line-height:1.4;
   background:#f8f9fb;color:#222;border:1px solid var(--border);font-weight:500}
-.src-btn .ic{font-size:24px;margin-bottom:4px}
+.src-btn .ic{font-size:20px;margin-bottom:4px;font-weight:700;color:var(--primary)}
 
 .chk-row{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer;
   user-select:none;-webkit-user-select:none}
 .chk-row input[type=checkbox]{width:20px;height:20px;margin:0;flex:none;accent-color:var(--primary)}
 .chk-row span{font-size:14px;color:#222;line-height:1.4}
 
+/* --- INFO PANEL (đã sửa lỗi ngắt dòng đứt chữ) --- */
 .info{display:none;margin-top:10px;padding:12px 14px;
   background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);
   border-radius:12px;border-left:4px solid var(--success)}
 .info.show{display:block}
 .info .t{font-weight:700;color:var(--success);margin-bottom:8px;
-  display:flex;align-items:center;gap:6px;font-size:13.5px}
-.info .row{display:flex;margin:5px 0;font-size:12.5px;align-items:flex-start;width:100%}
-.info .lbl{flex:0 0 95px;color:#4b5563;font-weight:500}
-.info .val{flex:1;min-width:0;font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
-  font-size:11px;word-break:normal;overflow-wrap:break-word;white-space:pre-wrap;color:#111}
+  font-size:13.5px}
+.info .row{
+  display:flex;
+  flex-wrap:wrap;
+  margin:6px 0;
+  font-size:12.5px;
+  align-items:flex-start;
+  width:100%;
+  gap:2px 8px;
+}
+.info .lbl{
+  flex:0 0 auto;
+  min-width:85px;
+  color:#4b5563;
+  font-weight:500;
+}
+.info .val{
+  flex:1 1 auto;
+  min-width:0;
+  font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;
+  font-size:11px;
+  word-break:normal;
+  overflow-wrap:anywhere;
+  hyphens:none;
+  white-space:pre-wrap;
+  color:#111;
+  line-height:1.5;
+  padding-top:1px;
+}
+@media (max-width: 420px){
+  .info .row{flex-direction:column;gap:1px;}
+  .info .lbl{flex:none;min-width:0;font-size:11.5px;color:#6b7280;}
+  .info .val{flex:none;width:100%;font-size:11px;}
+}
+
 .badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;
   font-weight:700;letter-spacing:.3px}
 .b-static{background:#fee2e2;color:#b91c1c}
 .b-dynamic{background:#dbeafe;color:#1d4ed8}
 
-/* Autocomplete giao diện */
+/* Autocomplete */
 .autocomplete-wrap{position:relative}
 .autocomplete-list{display:none;position:absolute;top:100%;left:0;right:0;
   background:#fff;border:1px solid var(--border);border-radius:10px;
@@ -112,7 +142,8 @@ button.orange{background:#f59e0b}
 .bank-logo-hint{width:24px;height:24px;object-fit:contain;flex:none;
   border-radius:4px;background:#fff}
 .bank-logo-fallback{display:inline-flex;align-items:center;justify-content:center;
-  font-size:16px;background:transparent;width:24px;height:24px;flex:none}
+  font-size:13px;background:#eef3ff;color:var(--primary);font-weight:700;
+  width:24px;height:24px;flex:none;border-radius:4px}
 
 /* QR output */
 .qr-out{display:none;margin-top:14px;text-align:center}
@@ -125,7 +156,7 @@ button.orange{background:#f59e0b}
 
 .qr-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px}
 .qr-actions button{padding:10px 6px;font-size:12px;gap:4px;flex-direction:column;min-height:56px}
-.qr-actions button .ic{font-size:18px;line-height:1}
+.qr-actions button .ic{font-size:16px;line-height:1;font-weight:700}
 
 .qr-str{margin-top:10px;font-family:ui-monospace,Consolas,monospace;font-size:11px;
   min-height:56px;background:#f8f9fb}
@@ -147,7 +178,7 @@ button.orange{background:#f59e0b}
   left:20px;right:20px;text-align:center;color:#fff;font-size:12px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);opacity:.85}
 
-/* Sticky button */
+/* Sticky */
 .sticky{position:fixed;bottom:0;left:0;right:0;
   padding:12px 16px calc(12px + var(--safe-bottom));
   background:rgba(255,255,255,.94);backdrop-filter:blur(12px);
@@ -190,7 +221,7 @@ button.orange{background:#f59e0b}
 <!-- Camera Overlay -->
 <div id="cam">
   <div class="cam-top">
-    <span class="ttl">📷 Quét QR</span>
+    <span class="ttl">Quét QR</span>
     <button onclick="closeCamera()">Đóng</button>
   </div>
   <div id="reader"></div>
@@ -201,40 +232,34 @@ button.orange{background:#f59e0b}
 <div id="sheet" onclick="if(event.target===this)closeSheet()">
   <div class="sheet-body">
     <div class="grab"></div>
-    <button onclick="copyQR();closeSheet()">
-      <span style="margin-right:12px">📋</span> Sao chép ảnh QR
-    </button>
-    <button id="sheetShareBtn" onclick="shareQR();closeSheet()">
-      <span style="margin-right:12px">📤</span> Chia sẻ
-    </button>
-    <button onclick="downloadQR();closeSheet()">
-      <span style="margin-right:12px">💾</span> Tải về máy
-    </button>
+    <button onclick="copyQR();closeSheet()">Sao chép ảnh QR</button>
+    <button id="sheetShareBtn" onclick="shareQR();closeSheet()">Chia sẻ</button>
+    <button onclick="downloadQR();closeSheet()">Tải về máy</button>
     <button class="cancel" onclick="closeSheet()">Hủy</button>
   </div>
 </div>
 
-<!-- CARD 1 — NGUỒN ẢNH -->
+<!-- CARD 1 - NGUỒN ẢNH -->
 <div class="card">
-  <h2>📥 Nạp ảnh QR</h2>
+  <h2>Nạp ảnh QR</h2>
   <p class="sub">Chọn 1 trong 3 cách để đọc mã QR</p>
   <div class="src-grid">
     <button class="src-btn" onclick="openCamera()">
-      <span class="ic">📷</span><span>Camera</span>
+      <span class="ic">CAM</span><span>Camera</span>
     </button>
     <button class="src-btn" onclick="pickImage()">
-      <span class="ic">🖼</span><span>Thư viện</span>
+      <span class="ic">IMG</span><span>Thư viện</span>
     </button>
     <button class="src-btn" onclick="pasteImage()">
-      <span class="ic">📋</span><span>Clipboard</span>
+      <span class="ic">PST</span><span>Clipboard</span>
     </button>
   </div>
   <input id="filePick" type="file" accept="image/*" style="display:none">
 </div>
 
-<!-- CARD 2 — FORM -->
+<!-- CARD 2 - FORM -->
 <div class="card">
-  <h2>💳 Thông tin thanh toán</h2>
+  <h2>Thông tin thanh toán</h2>
 
   <div class="fg">
     <label class="f">Mã ngân hàng / BIN</label>
@@ -272,7 +297,7 @@ button.orange{background:#f59e0b}
   </div>
 
   <div class="info" id="infoPanel">
-    <div class="t">✅ QR đã đọc thành công</div>
+    <div class="t">QR đã đọc thành công</div>
     <div class="row"><div class="lbl">Số TK:</div><div class="val" id="iAcc">—</div></div>
     <div class="row"><div class="lbl">Chủ tài khoản:</div><div class="val" id="iHolder">—</div></div>
     <div class="row"><div class="lbl">Số tiền:</div><div class="val" id="iAmt">—</div></div>
@@ -298,9 +323,9 @@ button.orange{background:#f59e0b}
   </label>
 </div>
 
-<!-- CARD 3 — KẾT QUẢ -->
+<!-- CARD 3 - KẾT QUẢ -->
 <div class="card">
-  <h2>🎯 Mã QR kết quả</h2>
+  <h2>Mã QR kết quả</h2>
 
   <div id="noQR" class="empty">
     Chưa có mã QR.<br>Nhập thông tin bên trên và nhấn <b>Tạo mã QR</b>.
@@ -310,13 +335,13 @@ button.orange{background:#f59e0b}
     <div id="qrCanvas"></div>
     <div class="qr-actions">
       <button class="green" onclick="copyQR()">
-        <span class="ic">📋</span><span>Sao chép</span>
+        <span class="ic">CP</span><span>Sao chép</span>
       </button>
       <button class="orange" id="btnShare" onclick="shareQR()">
-        <span class="ic">📤</span><span>Chia sẻ</span>
+        <span class="ic">SH</span><span>Chia sẻ</span>
       </button>
       <button onclick="downloadQR()">
-        <span class="ic">💾</span><span>Tải về</span>
+        <span class="ic">DL</span><span>Tải về</span>
       </button>
     </div>
     <textarea id="qrString" readonly class="qr-str"
@@ -353,7 +378,7 @@ const qrOutEl     = $('qrOut');
 const noQREl      = $('noQR');
 const qrStrEl     = $('qrString');
 
-/* --- TOAST GIAO DIỆN --- */
+/* --- TOAST --- */
 let toastTimer;
 function toast(msg, duration = 2200){
   const el = $('toast');
@@ -397,10 +422,10 @@ function updateBankHint(){
 
   if (BANKS.length === 0){
     if (/^\d{6}$/.test(v)){
-      bankHintEl.textContent = '🏦 BIN: ' + v + ' (chưa tải được danh sách)';
+      bankHintEl.textContent = 'BIN: ' + v + ' (chưa tải được danh sách)';
       bankHintEl.style.color = 'var(--muted)';
     } else {
-      bankHintEl.textContent = '⚠️ Chưa tải được danh sách ngân hàng';
+      bankHintEl.textContent = 'Chưa tải được danh sách ngân hàng';
       bankHintEl.style.color = 'var(--warning)';
     }
     return;
@@ -417,7 +442,7 @@ function updateBankHint(){
   if (found){
     const logoHtml = found.logo
       ? `<img src="${found.logo}" alt="" class="bank-logo-hint" onerror="this.style.display='none'">`
-      : `<span class="bank-logo-hint bank-logo-fallback">🏦</span>`;
+      : `<span class="bank-logo-hint bank-logo-fallback">B</span>`;
 
     bankHintEl.innerHTML =
       `<span class="bank-hint-row">
@@ -430,7 +455,7 @@ function updateBankHint(){
        <br><span style="color:var(--muted);font-size:10.5px">${found.fullName}</span>`;
     bankHintEl.style.color = 'var(--success)';
   } else if (/^\d{6}$/.test(v)){
-    bankHintEl.textContent = '⚠️ BIN không có trong danh sách';
+    bankHintEl.textContent = 'BIN không có trong danh sách';
     bankHintEl.style.color = 'var(--warning)';
   } else {
     bankHintEl.innerHTML = '';
@@ -468,7 +493,7 @@ function renderBankSuggest(query){
   bankSuggestEl.innerHTML = matches.map(b => {
     const logoHtml = b.logo
       ? `<img src="${b.logo}" alt="" class="bank-logo-hint" onerror="this.style.display='none'">`
-      : `<span class="bank-logo-hint bank-logo-fallback">🏦</span>`;
+      : `<span class="bank-logo-hint bank-logo-fallback">B</span>`;
 
     return `
     <div class="autocomplete-item" data-bin="${b.bin}">
@@ -530,7 +555,7 @@ bankEl.addEventListener('blur', () => {
   }
 });
 
-/* --- XỬ LÝ FORM & GIAO DIỆN KHÁC --- */
+/* --- FORM KHÁC --- */
 chkStaticEl.addEventListener('change', () => {
   const hint = $('modeHint');
   if (chkStaticEl.checked){
@@ -570,7 +595,7 @@ amtEl.addEventListener('input', () => {
   refreshState();
 });
 
-/* --- CAMERA GIAO DIỆN --- */
+/* --- CAMERA --- */
 function openCamera(){
   $('cam').classList.add('show');
   if (scanner){ scanner = null; }
@@ -598,18 +623,18 @@ function closeCamera(){
   }
 }
 
-/* --- TẢI ẢNH & PASTE ẢNH (Dùng hàm decodeImageFile từ app.js) --- */
+/* --- TẢI ẢNH & PASTE ẢNH --- */
 function pickImage(){ $('filePick').click(); }
 
 $('filePick').addEventListener('change', function(){
   const file = this.files[0];
   this.value = '';
   if (!file) return;
-  
+
   decodeImageFile(file, (text) => {
     handleDecoded(text);
   }, (errMsg) => {
-    toast('❌ ' + errMsg, 3500);
+    toast(errMsg, 3500);
   });
 });
 
@@ -625,11 +650,11 @@ async function pasteImage(){
       const imgType = it.types.find(t => t.startsWith('image/'));
       if (!imgType) continue;
       const blob = await it.getType(imgType);
-      
+
       decodeImageFile(blob, (text) => {
         handleDecoded(text);
       }, (errMsg) => {
-        toast('❌ ' + errMsg, 3500);
+        toast(errMsg, 3500);
       });
       found = true;
       break;
@@ -643,7 +668,8 @@ async function pasteImage(){
 /* --- XỬ LÝ KẾT QUẢ ĐỌC QR --- */
 function handleDecoded(text){
   if (!text) return;
-  text = text.trim().replace(/[\r\n]+/g, '').replace(/\u200B/g, '');
+  text = text.trim().replace(/[\r\n]+/g, '');
+  text = text.replace(/[\u200B-\u200F\uFEFF]/g, '');
 
   const info = parseVietQR(text);
 
@@ -683,7 +709,7 @@ function handleDecoded(text){
     msgEl.dispatchEvent(new Event('input'));
     updateBankHint();
 
-    toast('✅ Đã đọc QR thành công');
+    toast('Đã đọc QR thành công');
   } else {
     lastScannedInfo = null;
     $('infoPanel').classList.remove('show');
@@ -693,13 +719,13 @@ function handleDecoded(text){
     holderEl.value = '';
     amtEl.value = '';
     msgEl.value = '';
-    toast('⚠️ QR không phải VietQR — chỉ hiển thị chuỗi', 3000);
+    toast('QR không phải VietQR — chỉ hiển thị chuỗi', 3000);
   }
 
   refreshState();
 }
 
-/* --- TẠO MÃ QR (Giao diện) --- */
+/* --- TẠO MÃ QR --- */
 function genQR(){
   try {
     const amountRaw = amtEl.value.replace(/\D/g, '');
@@ -774,10 +800,10 @@ async function autoCopyQR(){
     if (currentQRBlob && window.ClipboardItem){
       const item = new ClipboardItem({ 'image/png': currentQRBlob });
       await navigator.clipboard.write([item]);
-      toast('✅ Đã tạo QR & sao chép ảnh vào clipboard');
+      toast('Đã tạo QR & sao chép ảnh vào clipboard');
     } else {
       await navigator.clipboard.writeText(qrStrEl.value);
-      toast('✅ Đã tạo QR & sao chép chuỗi');
+      toast('Đã tạo QR & sao chép chuỗi');
     }
   } catch {
     try {
@@ -797,7 +823,7 @@ async function copyQR(){
     }
     const item = new ClipboardItem({ 'image/png': currentQRBlob });
     await navigator.clipboard.write([item]);
-    toast('✅ Đã sao chép ảnh QR');
+    toast('Đã sao chép ảnh QR');
   } catch (e){
     toast('Không sao chép được: ' + e.message);
   }
@@ -832,11 +858,11 @@ async function shareQR(){
         title: 'Mã QR thanh toán',
         text: 'Mã VietQR thanh toán'
       });
-      toast('✅ Đã chia sẻ ảnh QR');
+      toast('Đã chia sẻ ảnh QR');
       return;
     }
     await navigator.share({ title: 'Mã QR thanh toán', text: qrStrEl.value });
-    toast('✅ Đã chia sẻ chuỗi QR');
+    toast('Đã chia sẻ chuỗi QR');
   } catch (e){
     if (e.name === 'AbortError') return;
     toast('Không chia sẻ được: ' + e.message);
@@ -887,12 +913,11 @@ refreshState();
 chkStaticEl.dispatchEvent(new Event('change'));
 msgEl.dispatchEvent(new Event('input'));
 
-// Nạp danh sách ngân hàng từ app.js
 loadBanks();
 
 setTimeout(() => {
   if (typeof QRCode === 'undefined' || typeof Html5Qrcode === 'undefined' || typeof jsQR === 'undefined'){
-    toast('⚠️ Thư viện QR chưa load đủ.', 5000);
+    toast('Thư viện QR chưa load đủ.', 5000);
   }
 }, 3000);
 </script>
